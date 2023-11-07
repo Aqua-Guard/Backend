@@ -3,10 +3,24 @@ const { Schema, model } = mongoose;
 
 const panierSchema = new Schema(
     {
-        totalpoints:{
-            type:Number,
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "user",
+            required: true
+        },
+        commandeId: {
+            type: Schema.Types.ObjectId,
+            ref: "commande",
+            required: true
+        },
+        Listproduit:{
+            type:Array,
             required:true
         },
+        nbpoints:{
+            type:Number,
+            required:true
+        }
     },
     {
         timestamps: true

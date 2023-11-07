@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
-
 const produitSchema = new Schema(
     {
         name: {
@@ -24,11 +23,9 @@ const produitSchema = new Schema(
             default: true,
             required : true 
         },
-        
     },
     {
         timestamps: true
     }
 );
-
 export default model('Produit', produitSchema)
