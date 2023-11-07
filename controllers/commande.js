@@ -29,15 +29,13 @@ export async function addOnce(req, res) {
 
 async function calculateNbPoints(listProduits) {
   let nbpoints = 0;
-  
+
   for (const produit of listProduits) {
 
     const productData = await Product.findOne({ _id: produit._id });
 
     if (productData) {
-
       nbpoints += productData.points;
-
     }
   }
   return nbpoints;

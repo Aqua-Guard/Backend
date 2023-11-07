@@ -8,7 +8,7 @@ const panierSchema = new Schema(
             ref: "panier",
             required: true
         },
-        Listproduit:{
+        Listproduits:{
             type:Array,
             required:true
         },

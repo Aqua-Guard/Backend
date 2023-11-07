@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
-const panierSchema = new Schema(
+const CommandeSchema = new Schema(
     {
         userId: {
             type: Schema.Types.ObjectId,
@@ -22,4 +22,4 @@ const panierSchema = new Schema(
         timestamps: true
     }
 );
-export default model('Panier', panierSchema);
+export default model('Panier', CommandeSchema);
