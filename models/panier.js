@@ -3,20 +3,15 @@ const { Schema, model } = mongoose;
 
 const panierSchema = new Schema(
     {
-        produitId:{
+        panierId:{
             type: Schema.Types.ObjectId,
-            ref: "produit",
+            ref: "panier",
             required: true
         },
-        commandeId:{
-            type: Schema.Types.ObjectId,
-            ref: "commande",
-            required: true
-        },
-        quantite:{
-            type:Number,
+        Listproduit:{
+            type:Array,
             required:true
-        }
+        },
     },
     {
         timestamps: true

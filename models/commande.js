@@ -13,10 +13,6 @@ const panierSchema = new Schema(
             ref: "commande",
             required: true
         },
-        Listproduit:{
-            type:Array,
-            required:true
-        },
         nbpoints:{
             type:Number,
             required:true
