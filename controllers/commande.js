@@ -1,5 +1,5 @@
 import Commande from "../models/commande.js";
-import Product from "../models/produit.js";
+import Produit from "../models/produit.js";
 import Panier from "../models/panier.js";
 
 export async function addOnce(req, res) {
@@ -26,16 +26,12 @@ export async function addOnce(req, res) {
     res.status(500).json({ error: "Failed to create the Commande." });
   }
 }
-
 async function calculateNbPoints(listProduits) {
   let nbpoints = 0;
-
   for (const produit of listProduits) {
-
-    const productData = await Product.findOne({ _id: produit._id });
-
-    if (productData) {
-      nbpoints += productData.points;
+    const donnesProduit = await Produit.findOne({ _id: produit._id });
+    if (donnesProduit) {
+      nbpoints += donnesProduit.points;
     }
   }
   return nbpoints;

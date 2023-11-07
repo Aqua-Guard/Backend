@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce } from '../controllers/produit.js';
+import { addOnce } from '../controllers/commande.js';
 
 const router = express.Router();
 router.post('/', addOnce);
