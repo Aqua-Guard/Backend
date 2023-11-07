@@ -22,4 +22,4 @@ const CommandeSchema = new Schema(
         timestamps: true
     }
 );
-export default model('Panier', CommandeSchema);
+export default model('Commande', CommandeSchema);

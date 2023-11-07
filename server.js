@@ -4,6 +4,8 @@ import morgan from "morgan";
 import cors from "cors";
 import { errorHandler, notFoundError } from "./middlewares/error-handler.js";
 import produitRoutes from "./routes/produit.js";
+import commandeRoutes from "./routes/commande.js";	
+import panierRoutes from "./routes/panier.js"; 
 
 const app = express();
 const PORT = process.env.PORT || 9090; // Corrected PORT assignment
@@ -25,6 +27,8 @@ app.use(morgan('dev')); // Logging in the terminal
 app.use(express.json()); // Parsing JSON
 // Routes
 app.use('/produit', produitRoutes);
+app.use('/commande', commandeRoutes);
+app.use('/panier', panierRoutes);
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors
 
