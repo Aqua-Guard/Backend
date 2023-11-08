@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { errorHandler,notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
+import participationRoutes from "./routes/participation.js";
 
 
 const app = express();
@@ -29,7 +30,10 @@ app.use(morgan('dev')); //statut fel terminal
 app.use(express.json()); // bch yjm ya9ra json
 
 //routes
-app.use('/events', eventRoutes);
+app.use('/events', eventRoutes);//Event routes
+app.use('/participations', participationRoutes);//Participation routes
+
+
 app.use(notFoundError); // bch yjib erreur 404
 app.use(errorHandler); // bch yjib erreur 500
 
