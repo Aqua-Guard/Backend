@@ -37,7 +37,7 @@ export function addOnce(req, res) {
 export function getAll(req, res) {
     Event.find()
         .then((events) => {
-            if (events) {
+            if (events.length > 0) {
                 res.status(200).json({ events: events });
             } else {
                 res.status(404).json({ error: "No events found." });
@@ -115,10 +115,10 @@ export function deleteOne(req, res) {
  * @param {*} res 
  */
 export function getAllByUser(req, res) {
-    
+
     Event.find({ "userId": req.params.userId })
         .then((events) => {
-            if (events) {
+            if (events.length > 0) {
                 res.status(200).json({ events: events });
             } else {
                 res.status(404).json({ error: "No events found for this user." });
