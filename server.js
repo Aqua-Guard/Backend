@@ -29,7 +29,7 @@ app.use(morgan('dev')); //statut fel terminal
 app.use(express.json()); // bch yjm ya9ra json
 
 //routes
-app.use('/event', eventRoutes);
+app.use('/events', eventRoutes);
 app.use(notFoundError); // bch yjib erreur 404
 app.use(errorHandler); // bch yjib erreur 500
 
