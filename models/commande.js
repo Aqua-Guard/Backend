@@ -18,6 +18,10 @@ const CommandeSchema = new Schema(
             ref: "panier",
             required: true
         },
+        Listproduits:{
+            type:Array,
+            required:true
+        },
         nbpoints:{
             type:Number,
             required:true

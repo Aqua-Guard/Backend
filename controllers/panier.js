@@ -11,6 +11,7 @@ export function addOnce(req, res) {
           if (!panier) {
             const newPanier = new Panier({
               Listproduits: productsToAdd,
+              _id: req.body.panierId,
             });
 
             newPanier.save()
