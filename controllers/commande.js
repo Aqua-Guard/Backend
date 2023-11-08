@@ -1,11 +1,10 @@
 import Commande from "../models/commande.js";
-import Produit from "../models/produit.js";
 import Panier from "../models/panier.js";
 //import User from "../models/user.js";
 import { deleteOne } from "./panier.js";
 
 export async function addOnce(req, res) {
-  const { _id, panierId , userId } = req.body;
+  const { _id, panierId, userId } = req.body;
 
   try {
     const panier = await Panier.findOne({ _id: panierId });
@@ -13,15 +12,19 @@ export async function addOnce(req, res) {
       res.status(404).json({ error: "Panier not found." });
       return;
     }
-    const listProduits =panier.listProduits
-    const nbpoints =  await calculateNbPoints(listProduits);
+
+    let Listproduits=[]
+    for (const produit of panier.Listproduits) {
+      Listproduits.push(produit);
+    }
+    const nbpoints = calculateNbPoints(Listproduits);
 
     const newCommande = await Commande.create({
       _id,
       panierId,
-      listProduits,
+      Listproduits,
       userId,
-      nbpoints
+      nbpoints,
     });
 
     res.status(201).json({ Commande: newCommande });
@@ -31,14 +34,10 @@ export async function addOnce(req, res) {
   }
 }
 
-
-async function calculateNbPoints(listProduits) {
+function calculateNbPoints(listProduits) {
   let nbpoints = 0;
   for (const produit of listProduits) {
-    const donneesProduit = await Produit.findOne({ _id: produit._id });
-    if (donneesProduit) {
-      nbpoints += donneesProduit.nbpoints;     
-    }
+    nbpoints += produit.nbpoints;
   }
   return nbpoints;
 }
