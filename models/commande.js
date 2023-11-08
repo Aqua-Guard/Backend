@@ -1,15 +1,34 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
-const panierSchema = new Schema(
+const CommandeSchema = new Schema(
     {
-        totalpoints:{
-            type:Number,
+        _id: {
+            type: Schema.Types.ObjectId,
+            ref: "commande",
+            required: true
+        },
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "user",
+            required: true
+        },
+        panierId: {
+            type: Schema.Types.ObjectId,
+            ref: "panier",
+            required: true
+        },
+        Listproduits:{
+            type:Array,
             required:true
         },
+        nbpoints:{
+            type:Number,
+            required:true
+        }
     },
     {
         timestamps: true
     }
 );
-export default model('Panier', panierSchema);
+export default model('Commande', CommandeSchema);
