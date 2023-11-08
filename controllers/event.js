@@ -20,9 +20,11 @@ export function addOnce(req, res) {
             DateFin: req.body.DateFin,
             Description: req.body.Description,
             lieu: req.body.lieu,
+            image: req.file.filename,
         })
-            .then((newEvent) => res.status(201).json({ event: newEvent })).catch((err) => {
-                res.status(500).json({ error: err });
+            .then((newEvent) => res.status(201).json({ event: newEvent }))
+            .catch((err) => {
+                res.status(500).json({ error: err.message });
             });
     }
 
@@ -43,7 +45,7 @@ export function getAll(req, res) {
                 res.status(404).json({ error: "No events found." });
             }
         })
-        .catch((err) => res.status(500).json({ error: err }));
+        .catch((err) => res.status(500).json({ error: err.message }));
 }
 
 
@@ -61,7 +63,7 @@ export function getOne(req, res) {
                 res.status(404).json({ error: "Event not found." });
             }
         })
-        .catch((err) => res.status(500).json({ error: err }));
+        .catch((err) => res.status(500).json({ error: err.message }));
 }
 
 
@@ -76,7 +78,7 @@ export function updateOne(req, res) {
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
-        Event.findOneAndUpdate({ "_id": req.params.id }, req.body)
+        Event.findOneAndUpdate({ "_id": req.params.id }, req.body, { new: true })
             .then((updatedEvent) => {
                 if (updatedEvent) {
                     res.status(200).json({ event: updatedEvent });
@@ -84,7 +86,7 @@ export function updateOne(req, res) {
                     res.status(404).json({ error: "Event not found." });
                 }
             })
-            .catch((err) => res.status(500).json({ error: err }));
+            .catch((err) => res.status(500).json({ error: err.message }));
     }
 
 }
@@ -105,7 +107,7 @@ export function deleteOne(req, res) {
                 res.status(404).json({ error: "Event not found." });
             }
         })
-        .catch((err) => res.status(500).json({ error: err }));
+        .catch((err) => res.status(500).json({ error: err.message }));
 }
 
 
@@ -124,5 +126,5 @@ export function getAllByUser(req, res) {
                 res.status(404).json({ error: "No events found for this user." });
             }
         })
-        .catch((err) => res.status(500).json({ error: err }));
+        .catch((err) => res.status(500).json({ error: err.message }));
 }

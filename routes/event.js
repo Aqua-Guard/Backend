@@ -1,6 +1,7 @@
 import express from 'express';
 import { addOnce, getAll, getOne, updateOne, deleteOne,getAllByUser } from '../controllers/event.js';
 import { body } from 'express-validator';
+import multer from '../middlewares/multer-config-event.js';
 
 // Custom validation function to check if DateDebut is before DateFin
 const isDateDebutBeforeDateFin = (value, { req }) => {
@@ -28,23 +29,25 @@ const router = express.Router();
 
 router
     .route('/')
-    .post(
-        body("name").isLength({ min: 3, max: 30 }),
-        body("DateDebut").isDate().custom(isDateDebutBeforeDateFin).custom(isDateDebutValid),
-        body("DateFin").isDate().custom(isDateFinAfterDateDebut),
-        body("Description").isLength({ min: 10, max: 100 }),
-        body("lieu").isLength({ min: 3, max: 30 }),
+    .post(multer,[
+        body("name").isLength({ min: 3, max: 30 }).withMessage("Name must be between 3 and 30 characters long."),
+        body("DateDebut").isDate().custom(isDateDebutBeforeDateFin).custom(isDateDebutValid).withMessage("DateDebut must be a valid date."),
+        body("DateFin").isDate().custom(isDateFinAfterDateDebut).withMessage("DateFin must be a valid date."),
+        body("Description").isLength({ min: 10, max: 500 }).withMessage("Description must be between 10 and 100 characters long."),
+        body("lieu").isLength({ min: 3, max: 30 }).withMessage()
+    ],
         addOnce)
     .get(getAll);
 
 router
     .route('/:id')
     .get(getOne)
-    .put(body("name").isLength({ min: 3, max: 30 }),
+    .put(multer,[
+        body("name").isLength({ min: 3, max: 30 }),
         body("DateDebut").isDate().custom(isDateDebutBeforeDateFin).custom(isDateDebutValid),
         body("DateFin").isDate().custom(isDateFinAfterDateDebut),
         body("Description").isLength({ min: 10, max: 100 }),
-        body("lieu").isLength({ min: 3, max: 30 }),
+        body("lieu").isLength({ min: 3, max: 30 })],
         updateOne)
     .delete(deleteOne);
     
