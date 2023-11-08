@@ -18,4 +18,4 @@ const participationSchema = new Schema({
     }
 });
 
-export default model("participation", participationSchema);
+export default model('Participation', participationSchema);
