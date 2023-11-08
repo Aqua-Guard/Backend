@@ -5,7 +5,7 @@ const eventSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: "user",
-        //required: true
+        required: true
     },
     name: {
         type: String,
@@ -13,19 +13,19 @@ const eventSchema = new Schema({
     },
     DateDebut: {
         type: Date,
-       // required: true
+        required: true
     },
     DateFin: {
         type: Date,
-        //required: true
+        required: true
     },
     Description: {
         type: String,
-       // required: true
+        required: true
     },
     lieu: {
         type: String,
-       // required: true
+        required: true
     },
     image: {
         type: String,
@@ -35,4 +35,4 @@ const eventSchema = new Schema({
     timestamps: true
 });
 
-export default model("event", eventSchema);
+export default model('Event', eventSchema);
