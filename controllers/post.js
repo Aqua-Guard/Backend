@@ -2,16 +2,15 @@ import Post from "../models/post.js";
 import { validationResult } from "express-validator";
 
 // Create a new post
-export function addPost(req, res) {
+export function addPost(req, res) { 
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
-    } else {
-        const newPost = new Post({
+    }else{
+          const newPost = new Post({
             userId: req.body.userId,
             description: req.body.description,
-            image: req.body.image,
+            image: req.file.filename,
         });
-
         newPost.save()
             .then(post => res.status(201).json(post))
             .catch(err => res.status(500).json({ error: err }));

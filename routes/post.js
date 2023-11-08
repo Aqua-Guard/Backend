@@ -1,42 +1,50 @@
 import express from 'express';
 import { addPost, deletePost, getAllPosts, getAllPostsByUser, updatePost } from '../controllers/post.js';
 import { body } from 'express-validator';
+import BadWordsFilter from 'bad-words';
+import multer from '../middlewares/multer-config-post.js';
+
 
 const router = express.Router();
-
+const filter = new BadWordsFilter();
 
 router
     .route('/')
-    .post(
+    
+    .post(multer,[
         body('description')
             .notEmpty()
             .trim()
             .isLength({ min: 20, max: 300 })
             .withMessage('The description must be between 20 and 300 characters long.')
-           
+            .custom((value) => {
+                if (filter.isProfane(value)) {
+                    throw new Error('The description contains inappropriate language.');
+                }
+                return true;
+            })
         ,
-        body('image')
-            .notEmpty()
-            .trim()
-            .isURL()
-            .withMessage('The image must be a valid URL.'),
+      
+
         body('userId')
             .notEmpty()
             .withMessage('User ID must not be empty.')
             .isMongoId()
             .withMessage('User ID must be a valid MongoDB ObjectId.'),
         body('nbLike')
+        
             .optional()
             .isInt({ min: 0 })
             .withMessage('The number of likes must be a non-negative integer.')
-            .toInt(),
+            .toInt(), 
+        ],
         addPost)
     .get(getAllPosts);
 
 router
     .route('/:userId')
     .get(getAllPostsByUser);
-    
+
 
 router
     .route('/:postId')
@@ -46,13 +54,19 @@ router
             .trim()
             .isLength({ min: 20, max: 300 })
             .withMessage('The description must be between 20 and 300 characters long.')
-            
+            .custom((value) => {
+                if (filter.isProfane(value)) {
+                    throw new Error('The description contains inappropriate language.');
+                }
+                return true;
+            })
         ,
         body('image')
             .notEmpty()
             .trim()
             .isURL()
             .withMessage('The image must be a valid URL.'),
-            updatePost)
-            .delete(deletePost);
+        multer,
+        updatePost)
+    .delete(deletePost);
 export default router;
