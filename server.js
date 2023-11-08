@@ -13,6 +13,7 @@ import participationRoutes from "./routes/participation.js";
 import produitRoutes from "./routes/produit.js";
 import commandeRoutes from "./routes/commande.js";
 import panierRoutes from "./routes/panier.js";
+import postRoutes from "./routes/post.js";
 
 
 
@@ -52,6 +53,7 @@ app.use(express.json()); // Parsing JSON
 app.use('/user', userRoute);
 
 app.use('/events', eventRoutes);//Event routes
+app.use('/posts', postRoutes);//Post routes
 app.use('/participations', participationRoutes);//Participation routes
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
