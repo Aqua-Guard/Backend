@@ -3,7 +3,7 @@ const { Schema, model } = mongoose;
 
 const panierSchema = new Schema(
     {
-        panierId:{
+        _id:{
             type: Schema.Types.ObjectId,
             ref: "panier",
             required: true

@@ -1,7 +1,7 @@
 import Commande from "../models/commande.js";
 import Produit from "../models/produit.js";
 import Panier from "../models/panier.js";
-
+import { deleteOne } from "./controllers/panier.js";
 export async function addOnce(req, res) {
   const { commandId, panierId } = req.body;
 
@@ -35,4 +35,8 @@ async function calculateNbPoints(listProduits) {
     }
   }
   return nbpoints;
+}
+
+export function validerCommande(panierId) {
+  deleteOne(panierId);
 }

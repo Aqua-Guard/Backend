@@ -3,14 +3,19 @@ const { Schema, model } = mongoose;
 
 const CommandeSchema = new Schema(
     {
+        _id: {
+            type: Schema.Types.ObjectId,
+            ref: "commande",
+            required: true
+        },
         userId: {
             type: Schema.Types.ObjectId,
             ref: "user",
             required: true
         },
-        commandeId: {
+        panierId: {
             type: Schema.Types.ObjectId,
-            ref: "commande",
+            ref: "panier",
             required: true
         },
         nbpoints:{

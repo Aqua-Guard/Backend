@@ -2,13 +2,11 @@ import Panier from "../models/panier.js";
 import Produit from "../models/produit.js";
 
 export function addOnce(req, res) {
-  // Assuming you have an array of product IDs that you want to add to the Panier
   const productIdsToAdd = req.body.productIdsToAdd;
 
-  // Fetch the products from the Produit schema based on the provided product IDs
+
   Produit.find({ _id: { $in: productIdsToAdd } })
     .then((productsToAdd) => {
-      // Fetch the existing Panier or create a new one if it doesn't exist
       Panier.findOne()
         .then((panier) => {
           if (!panier) {
@@ -41,5 +39,20 @@ export function addOnce(req, res) {
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: "Failed to fetch products from Produit." });
+    });
+    
+}
+export function deleteOne(id) {
+  Panier.findByIdAndDelete(id)
+    .then((deletedPanier) => {
+      if (deletedPanier) {
+        res.status(200).json({ Panier: deletedPanier });
+      } else {
+        res.status(404).json({ error: "Product not found." });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Failed to delete the panier." });
     });
 }
