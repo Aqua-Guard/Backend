@@ -42,6 +42,7 @@ export function register(req, res) {
                     isActivated: 1,
                     isBlocked: 0,
                     resetCode: 0,
+                    nbPts: 0,
                     image: image
                 })
                 .then(user => {

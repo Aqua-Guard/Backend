@@ -39,6 +39,10 @@ const userSchema = new Schema({
         type: Number,
         required: true,
     },
+    nbPts: {
+        type: Number,
+        required: true,
+    },
 
 }, { timestamps: true });
 
