@@ -4,7 +4,6 @@ import Produit from "../models/produit.js";
 export function addOnce(req, res) {
   const productIdsToAdd = req.body.productIdsToAdd;
 
-
   Produit.find({ _id: { $in: productIdsToAdd } })
     .then((productsToAdd) => {
       Panier.findOne()
