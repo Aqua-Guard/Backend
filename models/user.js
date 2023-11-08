@@ -2,14 +2,11 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
-    username:
-    {
+    username: {
         type: String,
         required: true,
     },
-    
-    password:
-    {
+    password: {
         type: String,
         required: true,
     },
@@ -39,6 +36,10 @@ const userSchema = new Schema({
         required: true,
     },
     resetCode: {
+        type: Number,
+        required: true,
+    },
+    nbPts: {
         type: Number,
         required: true,
     },
