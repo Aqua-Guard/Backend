@@ -1,7 +1,8 @@
 import Commande from "../models/commande.js";
 import Produit from "../models/produit.js";
 import Panier from "../models/panier.js";
-import { deleteOne } from "./controllers/panier.js";
+import { deleteOne } from "./panier.js";
+
 export async function addOnce(req, res) {
   const { commandId, panierId } = req.body;
 
