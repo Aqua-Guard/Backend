@@ -43,6 +43,11 @@ const userSchema = new Schema({
         type: Number,
         required: true,
     },
+    role: {
+        type: String,
+        enum: ['consommateur', 'partenaire', 'admin'],
+
+    }
 
 }, { timestamps: true });
 
