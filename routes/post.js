@@ -3,6 +3,7 @@ import { addPost, deletePost, dislikePost, getAllPosts, getAllPostsByUser, likeP
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
+import { addComment, getCommentsByPost } from '../controllers/comment.js';
 
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router
                 return true;
             })
         ,
-  
+
     ],
         addPost)
     .get(getAllPosts);
@@ -64,4 +65,22 @@ router
 router
     .route('/dislike/:postId')
     .put(dislikePost);
+
+router
+    .route('/:postId/comments')
+    .post(
+        body('comment')
+            .notEmpty()
+            .trim()
+            .isLength({ min: 10, max: 100 })
+            .withMessage('The comment must be between 10 and 100 characters long.')
+            .custom((value) => {
+                if (filter.isProfane(value)) {
+                    throw new Error('The comment contains inappropriate language.');
+                }
+                return true;
+            }),
+        addComment)
+    .get(getCommentsByPost)
+
 export default router;
