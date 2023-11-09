@@ -13,7 +13,7 @@ export function addOnce(req, res) {
               Listproduits: productsToAdd,
               _id: req.body.panierId,
             });
-
+            
             newPanier.save()
               .then((panier) => res.status(201).json({ Panier: panier }))
               .catch((error) => {

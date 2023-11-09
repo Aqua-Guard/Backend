@@ -1,7 +1,26 @@
-import Commande from "../models/commande.js";
-import Panier from "../models/panier.js";
-//import User from "../models/user.js";
-import { deleteOne } from "./panier.js";
+import Commandes from "../models/commande.js";
+import Paniers from "../models/panier.js";
+import Users from "../models/user.js";
+import Produit from "../models/produit.js";
+
+
+export function getAll(req, res) {
+  Commande.find()
+    .then((commande) => res.status(200).json({ Commande: commande }))
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Failed to get the products." });
+    });
+}
+
+export function getOne(req, res) {
+  Commande.findById(req.params.id)
+    .then((commande) => res.status(200).json({ Commande: commande }))
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Failed to get the product." });
+    });
+}
 
 export async function addOnce(req, res) {
   const { _id, panierId, userId } = req.body;
@@ -42,18 +61,42 @@ function calculateNbPoints(listProduits) {
   return nbpoints;
 }
 
-/*export async function validerCommande(panierId, userid, nbpoints, res) {
+export async function passerCommande(req, res) {
+  const userId = req.body.userId;
+  const panierId = req.body.panierId;
+  const commandeId = req.body.commandeId;
   try {
-    if (userid.points < nbpoints) {
-      await deleteOne(panierId);
-      const user = await User.findOne({ _id: userid._id });
-      if (user) {
-        user.points-=nbpoints;
-        await user.save();
-        res.status(200).json({ message: "Commande validée." });
-      } else {
-        res.status(500).json({ error: "User not found." });
+    const commande = await Commandes.findOne({ _id: commandeId });
+    const user = await Users.findOne({ _id: userId });
+    const panier = await Paniers.findOne({ _id: panierId });
+    const listProduits = panier.ListProduits;
+
+    if (!commande || !user || !panier) {
+      res.status(404).json({ error: "Commande, User, or Panier not found." });
+      return;
+    }
+
+    const produitIdCounts = {};
+
+    listProduits.forEach((produitId) => {
+      produitIdCounts[produitId] = (produitIdCounts[produitId] || 0) + 1;
+    });
+
+    console.log("ProduitId Occurrences:", produitIdCounts);
+
+    if (user.nbPts >= commande.nbpoints) {
+      await Paniers.deleteOne({ _id: panierId });
+      user.nbPts -= commande.nbpoints;
+      await user.save();
+      for (const produitId in produitIdCounts) {
+        const produit = await Produit.findOne({ _id: produitId });
+        if (produit) {
+          produit.quantite -= produitIdCounts[produitId];
+          await produit.save();
+        }
       }
+
+      res.status(200).json({ message: "Commande passée avec succès." });
     } else {
       res.status(500).json({ error: "Points insuffisants." });
     }
@@ -61,4 +104,10 @@ function calculateNbPoints(listProduits) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}*/
+}
+
+
+
+
+
+

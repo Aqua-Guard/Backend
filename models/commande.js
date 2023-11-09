@@ -3,11 +3,6 @@ const { Schema, model } = mongoose;
 
 const CommandeSchema = new Schema(
     {
-        _id: {
-            type: Schema.Types.ObjectId,
-            ref: "commande",
-            required: true
-        },
         userId: {
             type: Schema.Types.ObjectId,
             ref: "user",
