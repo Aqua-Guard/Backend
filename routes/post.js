@@ -24,22 +24,13 @@ router
                 return true;
             })
         ,
-        body('userId')
-            .notEmpty()
-            .withMessage('User ID must not be empty.')
-            .isMongoId()
-            .withMessage('User ID must be a valid MongoDB ObjectId.'),
-        body('nbLike')
-            .optional()
-            .isInt({ min: 0 })
-            .withMessage('The number of likes must be a non-negative integer.')
-            .toInt(),
+  
     ],
         addPost)
     .get(getAllPosts);
 
 router
-    .route('/:userId')
+    .route('/postByCurrentUser')
     .get(getAllPostsByUser);
 
 router

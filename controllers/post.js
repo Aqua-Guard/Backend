@@ -3,11 +3,12 @@ import { validationResult } from "express-validator";
 
 // Create a new post
 export function addPost(req, res) { 
+    const userId = req.user.userId;
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     }else{
           const newPost = new Post({
-            userId: req.body.userId,
+            userId: userId,
             description: req.body.description,
             image: req.file.filename,
         });
@@ -88,7 +89,8 @@ export function deletePost(req, res) {
 // Retrieve all posts by a specific user
 
 export function getAllPostsByUser(req, res) {
-    Post.find({ userId: req.params.userId })
+    const userId = req.user.userId;
+    Post.find({ userId: userId })
         .then(posts => {
             if (posts.length > 0) {
                 res.status(200).json(posts);
