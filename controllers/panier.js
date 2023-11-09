@@ -42,17 +42,3 @@ export function addOnce(req, res) {
     });
     
 }
-export function deleteOne(id) {
-  Panier.findByIdAndDelete(id)
-    .then((deletedPanier) => {
-      if (deletedPanier) {
-        res.status(200).json({ Panier: deletedPanier });
-      } else {
-        res.status(404).json({ error: "Product not found." });
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to delete the panier." });
-    });
-}
