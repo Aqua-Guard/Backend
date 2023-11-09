@@ -9,7 +9,8 @@ const eventSchema = new Schema({
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     DateDebut: {
         type: Date,
@@ -29,7 +30,7 @@ const eventSchema = new Schema({
     },
     image: {
         type: String,
-       // required: true
+        required: true
     },
 }, {
     timestamps: true
