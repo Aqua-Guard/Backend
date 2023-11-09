@@ -98,3 +98,68 @@ export function getAllPostsByUser(req, res) {
         })
         .catch(err => res.status(500).json({ error: err }));
 }
+
+// Like a post
+export async function likePost(req, res) {
+    const { postId } = req.params;
+    const userId = req.user.userId;
+    
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is missing or invalid' });
+    }
+
+    try {
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        if (post.likes.includes(userId)) {
+            return res.status(400).json({ message: 'You have already liked this post' });
+        }
+
+       
+        post.likes.push(userId);
+        post.nbLike += 1;
+
+        await post.save();
+
+        res.json(post);
+    } catch (error) {
+        res.status(500).json({ message: 'Error liking the post', error });
+    }
+}
+
+// Dislike a post
+export async function dislikePost(req, res) {
+    const { postId } = req.params;
+    const userId = req.user.userId;
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is missing or invalid' });
+    }
+
+    try {
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        if (!post.likes.includes(userId)) {
+            return res.status(400).json({ message: 'You cannot dislike a post you have not liked' });
+        }
+
+        // Remove userId from likes array and decrement nbLike
+        post.likes = post.likes.filter((userLikeId) => userLikeId.toString() !== userId.toString());
+        post.nbLike -= 1;
+
+        await post.save();
+        
+        res.json(post);
+    } catch (error) {
+        res.status(500).json({ message: 'Error disliking the post', error });
+    }
+}

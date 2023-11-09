@@ -1,5 +1,5 @@
 import express from 'express';
-import { addPost, deletePost, getAllPosts, getAllPostsByUser, updatePost } from '../controllers/post.js';
+import { addPost, deletePost, dislikePost, getAllPosts, getAllPostsByUser, likePost, updatePost } from '../controllers/post.js';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
@@ -10,8 +10,8 @@ const filter = new BadWordsFilter();
 
 router
     .route('/')
-    
-    .post(multer,[
+
+    .post(multer, [
         body('description')
             .notEmpty()
             .trim()
@@ -24,27 +24,23 @@ router
                 return true;
             })
         ,
-      
-
         body('userId')
             .notEmpty()
             .withMessage('User ID must not be empty.')
             .isMongoId()
             .withMessage('User ID must be a valid MongoDB ObjectId.'),
         body('nbLike')
-        
             .optional()
             .isInt({ min: 0 })
             .withMessage('The number of likes must be a non-negative integer.')
-            .toInt(), 
-        ],
+            .toInt(),
+    ],
         addPost)
     .get(getAllPosts);
 
 router
     .route('/:userId')
     .get(getAllPostsByUser);
-
 
 router
     .route('/:postId')
@@ -69,4 +65,12 @@ router
         multer,
         updatePost)
     .delete(deletePost);
+
+
+router
+    .route('/like/:postId')
+    .put(likePost);
+router
+    .route('/dislike/:postId')
+    .put(dislikePost);
 export default router;
