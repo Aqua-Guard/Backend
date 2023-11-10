@@ -9,12 +9,12 @@ import { validationResult } from "express-validator";
  * @returns 
  */
 export function addOnce(req, res) {
-
+    const userId = req.user.userId;
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
         Event.create({
-            userId: req.body.userId,
+            userId: userId,
             name: req.body.name,
             DateDebut: req.body.DateDebut,
             DateFin: req.body.DateFin,
@@ -117,6 +117,7 @@ export function deleteOne(req, res) {
  * @param {*} res 
  */
 export function getAllByUser(req, res) {
+
 
     Event.find({ "userId": req.params.userId })
         .then((events) => {

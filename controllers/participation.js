@@ -8,12 +8,13 @@ import { validationResult } from "express-validator";
  * @returns 
  */
 export function addOnce(req, res) {
+    const userId = req.user.userId;
 
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
         Participation.create({
-            userId: req.body.userId,
+            userId: userId,
             eventId: req.body.eventId,
         })
             .then((newParticipation) => res.status(201).json({ participation: newParticipation })).catch((err) => {
