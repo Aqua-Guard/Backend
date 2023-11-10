@@ -3,7 +3,7 @@ import { addOnce, passerCommande, getAll, getOne } from '../controllers/commande
 
 const router = express.Router();
 
-router.post('/ajouterproduit', addOnce);
+router.post('/ajoutercommande', addOnce);
 router.post('/passercommande', passerCommande);
 router.get('/', getAll);
 router.get('/:id', getOne);

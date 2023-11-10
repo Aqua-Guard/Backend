@@ -1,5 +1,5 @@
 import Commandes from "../models/commande.js";
-import Paniers from "../models/panier.js";
+import Panier from "../models/panier.js";
 import Users from "../models/user.js";
 import Produit from "../models/produit.js";
 
@@ -23,7 +23,7 @@ export function getOne(req, res) {
 }
 
 export async function addOnce(req, res) {
-  const { _id, panierId, userId } = req.body;
+  const { panierId, userId } = req.body;
 
   try {
     const panier = await Panier.findOne({ _id: panierId });
@@ -38,8 +38,7 @@ export async function addOnce(req, res) {
     }
     const nbpoints = calculateNbPoints(Listproduits);
 
-    const newCommande = await Commande.create({
-      _id,
+    const newCommande = await Commandes.create({
       panierId,
       Listproduits,
       userId,
@@ -68,8 +67,8 @@ export async function passerCommande(req, res) {
   try {
     const commande = await Commandes.findOne({ _id: commandeId });
     const user = await Users.findOne({ _id: userId });
-    const panier = await Paniers.findOne({ _id: panierId });
-    const listProduits = panier.ListProduits;
+    const panier = await Panier.findOne({ _id: panierId });
+    const listProduits = panier.Listproduits;
 
     if (!commande || !user || !panier) {
       res.status(404).json({ error: "Commande, User, or Panier not found." });
@@ -85,7 +84,7 @@ export async function passerCommande(req, res) {
     console.log("ProduitId Occurrences:", produitIdCounts);
 
     if (user.nbPts >= commande.nbpoints) {
-      await Paniers.deleteOne({ _id: panierId });
+      await Panier.deleteOne({ _id: panierId });
       user.nbPts -= commande.nbpoints;
       await user.save();
       for (const produitId in produitIdCounts) {
