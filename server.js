@@ -54,10 +54,10 @@ app.use(express.json()); // Parsing JSON
 
 app.use('/user', userRoute);
 
-app.use('/events', eventRoutes);//Event routes
+app.use('/events',authenticateToken, eventRoutes);//Event routes
 app.use('/posts', authenticateToken, postRoutes);//Post routes
 app.use('/comments', authenticateToken, commentRoutes);//Comment routes
-app.use('/participations', participationRoutes);//Participation routes
+app.use('/participations', authenticateToken,participationRoutes);//Participation routes
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
 app.use('/panier', panierRoutes);
