@@ -13,6 +13,7 @@ import produitRoutes from "./routes/produit.js";
 import commandeRoutes from "./routes/commande.js";
 import panierRoutes from "./routes/panier.js";
 import postRoutes from "./routes/post.js";
+import commentRoutes from "./routes/comment.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
 
 
@@ -53,7 +54,8 @@ app.use(express.json()); // Parsing JSON
 app.use('/user', userRoute);
 
 app.use('/events', eventRoutes);//Event routes
-app.use('/posts',authenticateToken, postRoutes);//Post routes
+app.use('/posts', authenticateToken, postRoutes);//Post routes
+app.use('/comments', authenticateToken, commentRoutes);//Comment routes
 app.use('/participations', participationRoutes);//Participation routes
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
