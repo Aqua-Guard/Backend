@@ -48,6 +48,7 @@ app.use(cors()); // Security
 app.use(morgan('dev')); // Logging in the terminal
 app.use(express.json()); // Parsing JSON
 
+app.use(express.static('public'));
 
 
 //routes
