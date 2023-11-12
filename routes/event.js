@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce, getAll, getOne, updateOne, deleteOne,getAllByUser } from '../controllers/event.js';
+import { addOnce, getAllEvents, getOne, updateOne, deleteOne,getAllByUser } from '../controllers/event.js';
 import { body } from 'express-validator';
 import multer from '../middlewares/multer-config-event.js';
 
@@ -37,7 +37,7 @@ router
         body("lieu").isLength({ min: 3, max: 30 }).withMessage()
     ],
         addOnce)
-    .get(getAll);
+    .get(getAllEvents);
 
 router
     .route('/:id')

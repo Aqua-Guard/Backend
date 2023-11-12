@@ -36,16 +36,28 @@ export function addOnce(req, res) {
  * @param {*} req 
  * @param {*} res 
  */
-export function getAll(req, res) {
+export function getAllEvents(req, res) {
     Event.find()
-        .then((events) => {
-            if (events.length > 0) {
-                res.status(200).json({ events: events });
-            } else {
-                res.status(404).json({ error: "No events found." });
-            }
-        })
-        .catch((err) => res.status(500).json({ error: err.message }));
+    .populate('userId', 'username role image') 
+    .then(async events => {
+        const transformedevents = await Promise.all(events.map(async event => {
+            return {
+                userName: event.userId?.username,
+                userImage: event.userId?.image,
+                eventName: event.name,
+                description: event.description,
+                eventImage: event.image,
+                DateDebut: event.DateDebut,
+                DateFin: event.DateFin,
+                lieu: event.lieu,
+            };
+        }));
+        res.status(200).json(transformedevents);
+    })
+    .catch(err => {
+        console.error('Error fetching events:', err);
+        res.status(500).json({ error: err });
+    });
 }
 
 
