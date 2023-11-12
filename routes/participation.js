@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce, getAll, deleteOne } from '../controllers/participation.js';
+import { addOnce, getAll, deleteOne,getAllByUser } from '../controllers/participation.js';
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router
 router
     .route('/:id')
     .delete(deleteOne);
+router
+    .route('/user/:userId')
+    .get(getAllByUser);
 
 export default router;
