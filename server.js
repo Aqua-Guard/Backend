@@ -48,6 +48,7 @@ app.use(cors()); // Security
 app.use(morgan('dev')); // Logging in the terminal
 app.use(express.json()); // Parsing JSON
 
+app.use(express.static('public'));
 
 
 //routes
@@ -55,7 +56,7 @@ app.use(express.json()); // Parsing JSON
 app.use('/user', userRoute);
 
 app.use('/events', eventRoutes);//Event routes
-app.use('/posts', authenticateToken, postRoutes);//Post routes
+app.use('/posts',authenticateToken, postRoutes);//Post routes
 app.use('/comments', authenticateToken, commentRoutes);//Comment routes
 app.use('/participations', participationRoutes);//Participation routes
 app.use('/produit', produitRoutes);

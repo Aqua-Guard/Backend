@@ -35,6 +35,24 @@ export const getCommentsByPost = async (req, res) => {
     }
 };
 
+export const getCommentsByIdPost = async (postId) => {
+    try {
+        const comments = await Comment.find({ postId: postId })
+            .populate('userId', 'firstName lastName image') // Populate only specific fields
+            .lean();
+        return comments.map(comment => {
+            return {
+                commentAvatar: comment.userId.image,
+                commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
+                comment: comment.comment
+            };
+        });
+    } catch (error) {
+        console.error('Error getting comments for post:', error);
+        return []; // Return an empty array on error
+    }
+};
+
 // Update a specific comment
 export const updateComment = async (req, res) => {
     const { commentId } = req.params;

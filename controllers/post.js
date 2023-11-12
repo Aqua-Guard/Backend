@@ -1,5 +1,6 @@
 import Post from "../models/post.js";
 import { validationResult } from "express-validator";
+import { getCommentsByIdPost } from "./comment.js";
 
 // Create a new post
 export function addPost(req, res) { 
@@ -20,15 +21,30 @@ export function addPost(req, res) {
 // Retrieve all posts
 export function getAllPosts(req, res) {
     Post.find()
-        .then(posts => {
-            if (posts.length > 0) {
-                res.status(200).json(posts);
-            } else {
-                res.status(404).json({ error: "No posts found." });
-            }
+        .populate('userId', 'username role image') 
+        .then(async posts => {
+            const transformedPosts = await Promise.all(posts.map(async post => {
+                const comments = await getCommentsByIdPost(post._id); // Await the comments
+                return {
+                    userName: post.userId?.username,
+                    userRole: post.userId?.role,
+                    userImage: post.userId?.image,
+                    description: post.description,
+                    postImage: post.image,
+                    nbLike: post.nbLike,
+                    nbComments: post.nbComments,
+                    nbShare: post.nbShare, // Ensure this field exists or is calculated
+                    comments: comments
+                };
+            }));
+            res.status(200).json(transformedPosts);
         })
-        .catch(err => res.status(500).json({ error: err }));
+        .catch(err => {
+            console.error('Error fetching posts:', err);
+            res.status(500).json({ error: err });
+        });
 }
+
 // Retrieve a post by id
 export function getPost(req, res) {
     Post.findById(req.params.id)
