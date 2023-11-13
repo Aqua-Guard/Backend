@@ -45,7 +45,7 @@ export function getAllEvents(req, res) {
                 userName: event.userId?.username,
                 userImage: event.userId?.image,
                 eventName: event.name,
-                description: event.description,
+                description: event.Description,
                 eventImage: event.image,
                 DateDebut: event.DateDebut,
                 DateFin: event.DateFin,
