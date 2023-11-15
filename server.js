@@ -2,8 +2,12 @@ import  express  from "express";
 import  mongoose  from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import { errorHandler,notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
+import actualiteroute from "./routes/actualite.js";
 
 
 const app = express();
@@ -24,11 +28,21 @@ mongoose.connect(`mongodb://127.0.0.1:27017/${databaseName}`)
     console.log(error);
 });
 
+app.use(express.urlencoded({ extended: true }));
+//////////////////////////////////////
+const __filename = fileURLToPath(import.meta.url); // Add this line
+const __dirname = path.dirname(__filename); 
+app.use(express.static(path.join(__dirname, 'public')));
+////////////////////////////////////////////////////////////////
+
+
+
 app.use(cors()); //security
 app.use(morgan('dev')); //statut fel terminal 
 app.use(express.json()); // bch yjm ya9ra json
 
 //routes
+app.use('/act',actualiteroute);
 app.use('/event', eventRoutes);
 app.use(notFoundError); // bch yjib erreur 404
 app.use(errorHandler); // bch yjib erreur 500
