@@ -4,35 +4,36 @@ const { Schema, model } = mongoose;
 const eventSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: "user",
-        //required: true
+        ref: "User",
+        required: true
     },
     name: {
         type: String,
-        required: true
+        required: true,
+        
     },
     DateDebut: {
         type: Date,
-       // required: true
+        required: true
     },
     DateFin: {
         type: Date,
-        //required: true
+        required: true
     },
     Description: {
         type: String,
-       // required: true
+        required: true
     },
     lieu: {
         type: String,
-       // required: true
+        required: true
     },
     image: {
         type: String,
-       // required: true
+        required: true
     },
 }, {
     timestamps: true
 });
 
-export default model("event", eventSchema);
+export default model('Event', eventSchema);

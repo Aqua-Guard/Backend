@@ -2,14 +2,11 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
-    username:
-    {
+    username: {
         type: String,
         required: true,
     },
-    
-    password:
-    {
+    password: {
         type: String,
         required: true,
     },
@@ -28,7 +25,7 @@ const userSchema = new Schema({
     },
     image: {
         type: String,
-        required: true,
+        required: false,
     },
     isActivated: {
         type: Boolean,
@@ -42,6 +39,15 @@ const userSchema = new Schema({
         type: Number,
         required: true,
     },
+    nbPts: {
+        type: Number,
+        required: true,
+    },
+    role: {
+        type: String,
+        enum: ['consommateur', 'partenaire', 'admin'],
+
+    }
 
 }, { timestamps: true });
 

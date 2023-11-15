@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
-
 const produitSchema = new Schema(
     {
+        _id: {
+            type: Schema.Types.ObjectId,
+            ref: "produit",
+            required: true
+        },
         name: {
             type: String,
             required: true
@@ -24,11 +28,9 @@ const produitSchema = new Schema(
             default: true,
             required : true 
         },
-        
     },
     {
         timestamps: true
     }
 );
-
 export default model('Produit', produitSchema)

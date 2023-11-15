@@ -5,7 +5,7 @@ const PostSchema = new Schema(
     {
         userId: {
             type: Schema.Types.ObjectId,
-            ref: "user",
+            ref: "User",
             required: true
         },
         description: {
@@ -20,7 +20,15 @@ const PostSchema = new Schema(
             type: Number,
             default: 0
         },
+        likes: [{
+            type: Schema.Types.ObjectId,
+            ref: "User",
+        }],
         nbComments: {
+            type: Number,
+            default: 0
+        },
+        nbShare: {
             type: Number,
             default: 0
         }
