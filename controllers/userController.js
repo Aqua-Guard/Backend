@@ -3,11 +3,12 @@ import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
+import multer from 'multer';
 
 export function login(req, res) {
     const { username, password } = req.body;
-
-    console.log(req.body, username, password)
+    console.log("zae")
+    console.log(username, password)
         // if (!(username && password)) {
         //     res.status(400).send("All input is required");
         // }
@@ -22,6 +23,7 @@ export function login(req, res) {
                         expiresIn: "2h",
                     }
                 );
+                console.log("zaeaz")
                 res.status(200).json({ user, token });
             }
             // } else
@@ -34,8 +36,8 @@ export function login(req, res) {
 
 export function registerAndroidIOS(req, res) {
     const username = req.body.username;
-    console.log(req.file)
-    const image = req.file.filename;
+    // console.log(req.file)
+    // const image = req.file.filename;
     User.findOne({ username })
         .then(exists => {
             if (exists) {
@@ -51,7 +53,7 @@ export function registerAndroidIOS(req, res) {
                     isBlocked: 0,
                     resetCode: 0,
                     nbPts: 0,
-                    image: image,
+                    image: '../public/images/user/profile_pic.png',
                     role: "consommateur"
                 })
                 .then(user => {
