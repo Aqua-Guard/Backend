@@ -15,6 +15,7 @@ import commandeRoutes from "./routes/commande.js";
 import panierRoutes from "./routes/panier.js";
 import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
+import likeRoutes from "./routes/like.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
 
 
@@ -55,8 +56,9 @@ app.use(express.static('public'));
 
 app.use('/user', userRoute);
 
-app.use('/events', authenticateToken, eventRoutes); //Event routes
-app.use('/posts', authenticateToken, postRoutes); //Post routes
+app.use('/events',  eventRoutes); //Event routes
+app.use('/posts',  postRoutes); //Post routes
+app.use('/like', likeRoutes); //Like routes
 app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);
@@ -64,7 +66,6 @@ app.use('/commande', commandeRoutes);
 app.use('/panier', panierRoutes);
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors
-
 
 
 

@@ -1,6 +1,8 @@
 import Post from "../models/post.js";
 import { validationResult } from "express-validator";
 import { getCommentsByIdPost } from "./comment.js";
+import comment from "../models/comment.js";
+import { getLikesByIdPost } from "./like.js";
 
 // Create a new post
 export function addPost(req, res) { 
@@ -18,33 +20,6 @@ export function addPost(req, res) {
             .catch(err => res.status(500).json({ error: err }));
     }
 } 
-// Retrieve all posts
-export function getAllPosts(req, res) {
-    Post.find()
-        .populate('userId', 'username role image') 
-        .then(async posts => {
-            const transformedPosts = await Promise.all(posts.map(async post => {
-                const comments = await getCommentsByIdPost(post._id); // Await the comments
-                return {
-                    userName: post.userId?.username,
-                    userRole: post.userId?.role,
-                    userImage: post.userId?.image,
-                    description: post.description,
-                    postImage: post.image,
-                    nbLike: post.nbLike,
-                    nbComments: post.nbComments,
-                    nbShare: post.nbShare, // Ensure this field exists or is calculated
-                    comments: comments
-                };
-            }));
-            res.status(200).json(transformedPosts);
-        })
-        .catch(err => {
-            console.error('Error fetching posts:', err);
-            res.status(500).json({ error: err });
-        });
-}
-
 // Retrieve a post by id
 export function getPost(req, res) {
     Post.findById(req.params.id)
@@ -180,4 +155,68 @@ export async function dislikePost(req, res) {
     } catch (error) {
         res.status(500).json({ message: 'Error disliking the post', error });
     }
+}
+
+// Retrieve all posts
+export function getAllPosts(req, res) {
+    Post.find()
+        .populate('userId', 'username role image') 
+        .then(async posts => {
+            const transformedPosts = await Promise.all(posts.map(async post => {
+                const comments = await getCommentsByIdPost(post._id);
+                const  nbComments = await comment.countDocuments({ postId: post._id });
+                return {
+                    idPost: post._id, // this is the id of the post
+                    userName: post.userId?.username,
+                    userRole: post.userId?.role,
+                    userImage: post.userId?.image,
+                    description: post.description,
+                    postImage: post.image,
+                    nbLike: post.nbLike,
+                    nbComments: nbComments,
+                    nbShare: post.nbShare, // Ensure this field exists or is calculated
+                    comments: comments
+                };
+            }));
+            res.status(200).json(transformedPosts);
+        })
+        .catch(err => {
+            console.error('Error fetching posts:', err);
+            res.status(500).json({ error: err });
+        });
+}
+
+// Retrieve a single post by ID
+export function getPostById(req, res) {
+    const postId = req.params.postId;
+    Post.findById(postId)
+        .populate('userId', 'username role image')
+        .then(async post => {
+            if (!post) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+            const comments = await getCommentsByIdPost(post._id);
+            const likes = await getLikesByIdPost(post._id);
+
+            const nbComments = await comment.countDocuments({ postId: post._id });
+
+            const transformedPost = {              
+                userName: post.userId?.username,
+                userRole: post.userId?.role,
+                userImage: post.userId?.image,
+                description: post.description,
+                postImage: post.image,
+                likes:likes,
+                nbLike: post.nbLike,
+                nbComments: nbComments,
+                nbShare: post.nbShare, // Ensure this field exists or is calculated
+                comments: comments
+            };
+            
+            res.status(200).json(transformedPost);
+        })
+        .catch(err => {
+            console.error('Error fetching post:', err);
+            res.status(500).json({ error: err });
+        });
 }
