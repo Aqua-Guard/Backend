@@ -57,8 +57,8 @@ app.use(express.static('public'));
 app.use('/user', userRoute);
 
 app.use('/events',  eventRoutes); //Event routes
-app.use('/posts',  postRoutes); //Post routes
-app.use('/like', likeRoutes); //Like routes
+app.use('/posts', authenticateToken, postRoutes); //Post routes
+app.use('/like',authenticateToken, likeRoutes); //Like routes
 app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);
