@@ -5,8 +5,7 @@ import cors from "cors";
 
 import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
-
-
+import actualiteroute from "./routes/actualite.js";
 import { errorHandler, notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
 import participationRoutes from "./routes/participation.js";
@@ -51,6 +50,7 @@ app.use(express.json()); // Parsing JSON
 
 app.use(express.static('public'));
 
+app.use(express.urlencoded({ extended: true }));
 
 //routes
 
@@ -63,6 +63,8 @@ app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
+app.use('/act',actualiteroute);
+app.use('/event', eventRoutes);
 app.use('/panier', panierRoutes);
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors

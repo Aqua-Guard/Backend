@@ -6,15 +6,19 @@ const messageSchema = new Schema(
 
         senderId:{
             type: Schema.Types.ObjectId,
-            ref: "user",
+            ref: "User",
             required: true
         },
         recipientld:{
             type: Schema.Types.ObjectId,
-            ref: "user",
+            ref: "User",
             required: true
         },
         text:{
+            type:String,
+            required:true
+        },
+        image:{
             type:String,
             required:true
         },
