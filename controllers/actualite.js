@@ -26,7 +26,7 @@ export function getOnce(req, res) {
             userId: new mongoose.Types.ObjectId(req.body.userId),
             title: req.body.title,
             description: req.body.desc,
-            image: `${req.protocol}://${req.get('host')}/img/${req.file.filename}`,
+            image: `${req.protocol}://${req.get('host')}/image/actualite/${req.file.filename}`,
             text: req.body.text,
             views: 0
             });

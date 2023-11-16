@@ -20,10 +20,6 @@ const PostSchema = new Schema(
             type: Number,
             default: 0
         },
-        likes: [{
-            type: Schema.Types.ObjectId,
-            ref: "User",
-        }],
         nbComments: {
             type: Number,
             default: 0
