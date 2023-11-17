@@ -56,7 +56,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/user', userRoute);
 
-app.use('/events',  eventRoutes); //Event routes
+app.use('/events',  authenticateToken, eventRoutes); //Event routes
 app.use('/posts', authenticateToken, postRoutes); //Post routes
 app.use('/like',authenticateToken, likeRoutes); //Like routes
 app.use('/comments', authenticateToken, commentRoutes); //Comment routes
