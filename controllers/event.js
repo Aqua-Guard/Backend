@@ -42,6 +42,7 @@ export function getAllEvents(req, res) {
     .then(async events => {
         const transformedevents = await Promise.all(events.map(async event => {
             return {
+                idEvent: event._id,
                 userName: event.userId?.username,
                 userImage: event.userId?.image,
                 eventName: event.name,
