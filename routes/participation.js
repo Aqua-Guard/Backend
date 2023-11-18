@@ -1,11 +1,10 @@
 import express from 'express';
-import { addOnce, getAll, deleteOne,getAllByUser } from '../controllers/participation.js';
+import { addOnce, getAll, deleteOne,getAllByUser,isParticipated } from '../controllers/participation.js';
 
 const router = express.Router();
 
 router
     .route('/')
-    .post(addOnce)
     .get(getAll);
 
 router
@@ -14,5 +13,9 @@ router
 router
     .route('/user/:userId')
     .get(getAllByUser);
+router
+    .route('/participate/:eventId')
+    .get(isParticipated)
+    .post(addOnce);
 
 export default router;

@@ -64,7 +64,6 @@ app.use('/participations', authenticateToken, participationRoutes); //Participat
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
 app.use('/act',actualiteroute);
-app.use('/event', eventRoutes);
 app.use('/panier', panierRoutes);
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors
