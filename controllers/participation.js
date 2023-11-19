@@ -90,8 +90,10 @@ export function deleteOne(req, res) {
  * @param {*} res 
  */
 export async function getAllByUser(req, res) {
+    const userId = req.user.userId;
+
     try {
-        const participations = await Participation.find({ userId: req.params.userId })
+        const participations = await Participation.find({ userId: userId })
             .populate('eventId', 'name DateDebut');
 
         if (participations.length > 0) {
@@ -100,8 +102,7 @@ export async function getAllByUser(req, res) {
                 return {
                     _id: participation._id,
                     DateEvent: event.DateDebut,
-                    name: event.name,
-                    date: participation.date
+                    Eventname: event.name,
                 };
             }));
 

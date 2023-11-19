@@ -11,7 +11,7 @@ router
     .route('/:id')
     .delete(deleteOne);
 router
-    .route('/user/:userId')
+    .route('/user')
     .get(getAllByUser);
 router
     .route('/participate/:eventId')
