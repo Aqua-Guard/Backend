@@ -42,6 +42,7 @@ export const getCommentsByIdPost = async (postId) => {
             .lean();
         return comments.map(comment => {
             return {
+                idComment : comment._id,
                 commentAvatar: comment.userId.image,
                 commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
                 comment: comment.comment
