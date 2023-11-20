@@ -24,30 +24,51 @@ export const addComment = async (req, res) => {
     }
 };
 
-// Get all comments for a specific post
 export const getCommentsByPost = async (req, res) => {
-    const { postId } = req.params;
-    try {
-        const comments = await Comment.find({ postId });
-        res.status(200).json(comments);
-    } catch (error) {
-        res.status(500).json({ message: 'Error getting comments', error });
-    }
-};
-
-export const getCommentsByIdPost = async (postId) => {
+    const postId = req.params.postId;
+    const userId = req.user.userId;
+    console.log(userId)
     try {
         const comments = await Comment.find({ postId: postId })
             .populate('userId', 'firstName lastName image') // Populate only specific fields
             .lean();
-        return comments.map(comment => {
+
+        const formattedComments = comments.map(comment => {
             return {
-                idComment : comment._id,
+                idUser: userId, 
+                idPost: postId, 
+                idComment: comment._id,
                 commentAvatar: comment.userId.image,
                 commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
                 comment: comment.comment
             };
-        });
+        }).filter(comment => comment !== null); // Filter out null comments
+
+        res.json(formattedComments);
+
+    } catch (error) {
+        console.error('Error getting comments for post:', error);
+        res.status(500).send('Error getting comments');
+    }
+};
+
+
+export const getCommentsByIdPost = async (postId) => {
+    try {
+        const comments = await Comment.find({ postId: postId })
+            .populate('userId', 'userId firstName lastName image') // Populate only specific fields
+            .lean();
+            return comments.slice(0, 3).map(comment => {
+                return {
+                    idUser: comment.userId._id,
+                    idPost: comment.postId._id,
+                    idComment : comment._id,
+                    commentAvatar: comment.userId.image,
+                    commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
+                    comment: comment.comment
+                };
+            });
+            
     } catch (error) {
         console.error('Error getting comments for post:', error);
         return []; // Return an empty array on error
