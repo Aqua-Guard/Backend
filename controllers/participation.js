@@ -90,8 +90,10 @@ export function deleteOne(req, res) {
  * @param {*} res 
  */
 export async function getAllByUser(req, res) {
+    const userId = req.user.userId;
+
     try {
-        const participations = await Participation.find({ userId: req.params.userId })
+        const participations = await Participation.find({ userId: userId })
             .populate('eventId', 'name DateDebut');
 
         if (participations.length > 0) {
@@ -100,8 +102,7 @@ export async function getAllByUser(req, res) {
                 return {
                     _id: participation._id,
                     DateEvent: event.DateDebut,
-                    name: event.name,
-                    date: participation.date
+                    Eventname: event.name,
                 };
             }));
 
@@ -130,4 +131,20 @@ export async function isParticipated(req, res) {
         console.error('Error checking participation status:', error);
         res.status(500).json({ error: error.message });
     }
+}
+
+
+export function deleteParticipation(req, res) {
+    const eventId = req.params.eventId;
+    const userId = req.user.userId; 
+
+    Participation.findOneAndDelete({ eventId: eventId, userId: userId })
+        .then((participation) => {
+            if (participation) {
+                res.status(200).json({ message: "participation deleted successfully." });
+            } else {
+                res.status(404).json({ error: "participation not found." });
+            }
+        })
+        .catch((err) => res.status(500).json({ error: err }));
 }
