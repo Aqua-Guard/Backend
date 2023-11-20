@@ -8,28 +8,27 @@ export function login(req, res) {
     const { username, password } = req.body;
 
     console.log(username, password)
-        // if (!(username && password)) {
-        //     res.status(400).send("All input is required");
-        // }
-    if (validationResult(req).isEmpty()) {
-        return res.status(400).json({ errors: validationResult(req).array() });
-    } else {
-        User.findOne({ username: username }).then(user => {
-
-            if (user && (bcrypt.compareSync(password, user.password))) {
-                const token = jwt.sign({ userId: user._id, username },
-                    process.env.secret_token, {
-                        expiresIn: "2h",
-                    }
-                );
-
-                res.status(200).json({ user, token });
-            }
-            // } else
-            //     res.status(400).json({ message: 'Invalid Credentials!' });
-        })
+    if (!(username && password)) {
+        res.status(400).send("All input is required");
     }
+    // if (validationResult(req).isEmpty()) {
+    //     return res.status(400).json({ errors: validationResult(req).array() });
+    // } else {
+    User.findOne({ username: username }).then(user => {
 
+        if (user && (bcrypt.compareSync(password, user.password))) {
+            const token = jwt.sign({ userId: user._id, username },
+                process.env.secret_token, {
+                    expiresIn: "2h",
+                }
+            );
+
+            res.status(200).json({ user, token });
+        } else
+            res.status(400).json({ message: 'Invalid Credentials!' });
+    })
+
+    //})
 
 };
 
@@ -89,7 +88,7 @@ export function registerFlutter(req, res) {
                     resetCode: 0,
                     nbPts: 0,
                     image: image,
-                    role: "admin"
+                    role: "user"
                 })
                 .then(user => {
                     res.status(201).json(user);
@@ -160,6 +159,7 @@ export async function verifyCode(req, res) {
     } else
         res.status(200).json({ message: 'false' });
 };
+
 export async function forgotPassword(req, res) {
 
     const { email, newPassword, confirmPassword } = req.body;
@@ -178,4 +178,35 @@ export async function forgotPassword(req, res) {
             });
     } else
         res.status(500).json({ message: "2 passwords don't match" })
+};
+
+
+export async function changePassword(req, res) {
+    const { email, newPassword, confirmPassword, oldPassword } = req.body;
+
+    const user = await User.findOne({ email: email })
+
+    console.log(email, newPassword, confirmPassword, oldPassword)
+    if (user && (bcrypt.compareSync(oldPassword, user.password))) {
+        if (newPassword === confirmPassword) {
+
+            user.password = bcrypt.hashSync(req.body.newPassword);
+            await user.save();
+            res.status(200).json({ data: req.body });
+        } else
+            res.status(200).json({ response: "passwords don't match" });
+
+
+
+    } else
+        res.status(500).json({ message: "email or password don't match" })
+};
+
+export async function deleteUser(req, res) {
+    await User.findOne({ email: req.body.email })
+        .deleteOne().then(data => {
+            res.status(200).json({ data: data });
+        }).catch(err => {
+            res.status(500).json({ message: err })
+        });
 };
