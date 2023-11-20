@@ -23,7 +23,7 @@ export function login(req, res) {
                 }
             );
 
-            res.status(200).json({ user, token });
+            res.status(200).json({ username: user.username, role: user.role, email: user.email, isActivated: user.isActivated, token });
         } else
             res.status(400).json({ message: 'Invalid Credentials!' });
     })
@@ -195,18 +195,16 @@ export async function changePassword(req, res) {
             res.status(200).json({ data: req.body });
         } else
             res.status(200).json({ response: "passwords don't match" });
-
-
-
     } else
         res.status(500).json({ message: "email or password don't match" })
 };
 
 export async function deleteUser(req, res) {
-    await User.findOne({ email: req.body.email })
-        .deleteOne().then(data => {
-            res.status(200).json({ data: data });
-        }).catch(err => {
-            res.status(500).json({ message: err })
+    await User.findOneAndDelete({ email: req.params.email })
+        .then(data => {
+            return res.status(200).json({ message: "deleted" });
+        })
+        .catch(err => {
+            return res.status(404).json({ message: 'user not found' });
         });
 };

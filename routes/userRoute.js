@@ -25,6 +25,6 @@ router.route('/sendActivationCode').post(sendActivationCode);
 router.route('/verifyCode').post(verifyCode);
 router.route('/forgotPassword').post(forgotPassword);
 router.route('/changePassword').post(changePassword);
-router.route('/deleteUser').post(deleteUser);
+router.route('/deleteUser/:email').delete(deleteUser);
 
 export default router;
