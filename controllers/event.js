@@ -63,6 +63,44 @@ export function getAllEvents(req, res) {
 }
 
 
+
+/**
+ * Get all events of a specific user
+ * @param {*} req 
+ * @param {*} res 
+ */
+export function getAllEventsByUser(req, res) {
+    const userId = req.user.userId;
+
+    Event.find({ userId: userId })
+        .populate('userId', 'username role image')
+        .then(async events => {
+            if (events.length > 0) {
+                const transformedEvents = await Promise.all(events.map(async event => {
+                    return {
+                        idEvent: event._id,
+                        userName: event.userId?.username,
+                        userImage: event.userId?.image,
+                        eventName: event.name,
+                        description: event.Description,
+                        eventImage: event.image,
+                        DateDebut: event.DateDebut,
+                        DateFin: event.DateFin,
+                        lieu: event.lieu,
+                    };
+                }));
+                res.status(200).json(transformedEvents);
+            } else {
+                res.status(404).json({ error: "No events found for this user." });
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching user events:', err);
+            res.status(500).json({ error: err });
+        });
+}
+
+
 /**
  * Get a specific event
  * @param {*} req 
@@ -125,41 +163,3 @@ export function deleteOne(req, res) {
 }
 
 
-/**
- * Get all events of a specific user
- * @param {*} req 
- * @param {*} res 
- */
-export async function getAllByUser(req, res) {
-    const userId = req.user.userId;
-    console.log('User ID:', userId);
-
-    try {
-        const events = await Event.find({ userId: userId })
-        .populate('userId', 'username role image');
-
-        if (events.length > 0) {
-            const transformedevents = await Promise.all(events.map(async event => {
-
-                return {
-                    idEvent: event._id,
-                    userName: event.userId?.username,
-                    userImage: event.userId?.image,
-                    eventName: event.name,
-                    description: event.Description,
-                    eventImage: event.image,
-                    DateDebut: event.DateDebut,
-                    DateFin: event.DateFin,
-                    lieu: event.lieu,
-                };
-            }));
-            res.status(200).json(transformedevents);
-        } else {
-            res.status(404).json({ error: "No events found." });
-        }
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-}

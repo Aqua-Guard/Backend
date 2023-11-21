@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce, getAllEvents, getOne, updateOne, deleteOne,getAllByUser } from '../controllers/event.js';
+import { addOnce, getAllEvents, getOne, updateOne, deleteOne,getAllEventsByUser } from '../controllers/event.js';
 import { body } from 'express-validator';
 import multer from '../middlewares/multer-config-event.js';
 
@@ -39,6 +39,10 @@ router
         addOnce)
     .get(getAllEvents);
 
+    router
+    .route('/eventByCurrentUser')
+    .get(getAllEventsByUser);
+
 router
     .route('/:id')
     .get(getOne)
@@ -51,8 +55,7 @@ router
         updateOne)
     .delete(deleteOne);
     
-router
-    .route('/user')
-    .get(getAllByUser);
+   
+
 
 export default router;
