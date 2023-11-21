@@ -17,9 +17,9 @@ export const addComment = async (req, res) => {
 
         try {
             const savedComment = await newComment.save();
-            res.status(201).json(savedComment);
+            res.status(201).send({ message : "Comment added successfully"});     
         } catch (error) {
-            res.status(500).json({ message: 'Error adding comment', error });
+            res.status(500).send({ message : "Error adding comment"}); 
         }
     }
 };
@@ -32,7 +32,6 @@ export const getCommentsByPost = async (req, res) => {
         const comments = await Comment.find({ postId: postId })
             .populate('userId', 'firstName lastName image') // Populate only specific fields
             .lean();
-
         const formattedComments = comments.map(comment => {
             return {
                 idUser: userId, 
@@ -58,22 +57,23 @@ export const getCommentsByIdPost = async (postId) => {
         const comments = await Comment.find({ postId: postId })
             .populate('userId', 'userId firstName lastName image') // Populate only specific fields
             .lean();
-            return comments.slice(0, 3).map(comment => {
-                return {
-                    idUser: comment.userId._id,
-                    idPost: comment.postId._id,
-                    idComment : comment._id,
-                    commentAvatar: comment.userId.image,
-                    commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
-                    comment: comment.comment
-                };
-            });
+        return comments.map(comment => {
+            return {
+                idUser: comment.userId._id,
+                idPost: comment.postId._id,
+                idComment : comment._id,
+                commentAvatar: comment.userId.image,
+                commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
+                comment: comment.comment
+            };
+        });
             
     } catch (error) {
         console.error('Error getting comments for post:', error);
         return []; // Return an empty array on error
     }
 };
+
 
 // Update a specific comment
 export const updateComment = async (req, res) => {
