@@ -52,7 +52,7 @@ router
     .delete(deleteOne);
     
 router
-    .route('/user/:userId')
-    .get(getAllByUser)
+    .route('/user')
+    .get(getAllByUser);
 
 export default router;
