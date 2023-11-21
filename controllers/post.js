@@ -81,16 +81,38 @@ export function deletePost(req, res) {
 
 export function getAllPostsByUser(req, res) {
     const userId = req.user.userId;
+
     Post.find({ userId: userId })
-        .then(posts => {
+        .populate('userId', 'username role image')
+        .then(async posts => {
             if (posts.length > 0) {
-                res.status(200).json(posts);
+                const transformedPosts = await Promise.all(posts.map(async post => {
+                    const comments = await getCommentsByIdPost(post._id);
+                    const nbComments = await comment.countDocuments({ postId: post._id });
+                    return {
+                        idPost: post._id,
+                        userName: post.userId?.username,
+                        userRole: post.userId?.role,
+                        userImage: post.userId?.image,
+                        description: post.description,
+                        postImage: post.image,
+                        nbLike: post.nbLike,
+                        nbComments: nbComments,
+                        nbShare: post.nbShare,
+                        comments: comments
+                    };
+                }));
+                res.status(200).json(transformedPosts);
             } else {
                 res.status(404).json({ error: "No posts found for this user." });
             }
         })
-        .catch(err => res.status(500).json({ error: err }));
+        .catch(err => {
+            console.error('Error fetching user posts:', err);
+            res.status(500).json({ error: err });
+        });
 }
+
 
 // Like a post
 export async function likePost(req, res) {
