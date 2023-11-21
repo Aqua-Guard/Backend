@@ -1,5 +1,6 @@
 import Event from "../models/event.js";
 import { validationResult } from "express-validator";
+import User from "../models/user.js";
 
 
 /**
@@ -38,27 +39,65 @@ export function addOnce(req, res) {
  */
 export function getAllEvents(req, res) {
     Event.find()
-    .populate('userId', 'username role image') 
-    .then(async events => {
-        const transformedevents = await Promise.all(events.map(async event => {
-            return {
-                idEvent: event._id,
-                userName: event.userId?.username,
-                userImage: event.userId?.image,
-                eventName: event.name,
-                description: event.Description,
-                eventImage: event.image,
-                DateDebut: event.DateDebut,
-                DateFin: event.DateFin,
-                lieu: event.lieu,
-            };
-        }));
-        res.status(200).json(transformedevents);
-    })
-    .catch(err => {
-        console.error('Error fetching events:', err);
-        res.status(500).json({ error: err });
-    });
+        .populate('userId', 'username role image')
+        .then(async events => {
+            const transformedevents = await Promise.all(events.map(async event => {
+                return {
+                    idEvent: event._id,
+                    userName: event.userId?.username,
+                    userImage: event.userId?.image,
+                    eventName: event.name,
+                    description: event.Description,
+                    eventImage: event.image,
+                    DateDebut: event.DateDebut,
+                    DateFin: event.DateFin,
+                    lieu: event.lieu,
+                };
+            }));
+            res.status(200).json(transformedevents);
+        })
+        .catch(err => {
+            console.error('Error fetching events:', err);
+            res.status(500).json({ error: err });
+        });
+}
+
+
+
+/**
+ * Get all events of a specific user
+ * @param {*} req 
+ * @param {*} res 
+ */
+export function getAllEventsByUser(req, res) {
+    const userId = req.user.userId;
+
+    Event.find({ userId: userId })
+        .populate('userId', 'username role image')
+        .then(async events => {
+            if (events.length > 0) {
+                const transformedEvents = await Promise.all(events.map(async event => {
+                    return {
+                        idEvent: event._id,
+                        userName: event.userId?.username,
+                        userImage: event.userId?.image,
+                        eventName: event.name,
+                        description: event.Description,
+                        eventImage: event.image,
+                        DateDebut: event.DateDebut,
+                        DateFin: event.DateFin,
+                        lieu: event.lieu,
+                    };
+                }));
+                res.status(200).json(transformedEvents);
+            } else {
+                res.status(404).json({ error: "No events found for this user." });
+            }
+        })
+        .catch(err => {
+            console.error('Error fetching user events:', err);
+            res.status(500).json({ error: err });
+        });
 }
 
 
@@ -124,21 +163,3 @@ export function deleteOne(req, res) {
 }
 
 
-/**
- * Get all events of a specific user
- * @param {*} req 
- * @param {*} res 
- */
-export function getAllByUser(req, res) {
-
-
-    Event.find({ "userId": req.params.userId })
-        .then((events) => {
-            if (events.length > 0) {
-                res.status(200).json({ events: events });
-            } else {
-                res.status(404).json({ error: "No events found for this user." });
-            }
-        })
-        .catch((err) => res.status(500).json({ error: err.message }));
-}
