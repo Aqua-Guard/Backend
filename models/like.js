@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
-const CommentSchema = new Schema(
+const LikeSchema = new Schema(
     {
         userId: {
             type: Schema.Types.ObjectId,
@@ -13,14 +13,10 @@ const CommentSchema = new Schema(
         ref: "Post",
         required: true
         },
-        comment: {
-            type: String,
-            required: true
-        }
     },
     {
         timestamps: true
     }
 );
 
-export default model('Comment', CommentSchema);
+export default model('Like', LikeSchema);

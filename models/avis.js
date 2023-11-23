@@ -1,19 +1,19 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
-const CommentSchema = new Schema(
+const avisSchema = new Schema(
     {
         userId: {
             type: Schema.Types.ObjectId,
-            ref: "User",
+            ref: "user",
             required: true
         },
-        postId: {
+        actualiteTitle: {
             type: Schema.Types.ObjectId,
-        ref: "Post",
-        required: true
+            ref:"actualite",
+            required: true
         },
-        comment: {
+        avis: {
             type: String,
             required: true
         }
@@ -22,5 +22,4 @@ const CommentSchema = new Schema(
         timestamps: true
     }
 );
-
-export default model('Comment', CommentSchema);
+export default model("Avis", avisSchema);

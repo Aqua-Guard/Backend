@@ -17,23 +17,63 @@ export const addComment = async (req, res) => {
 
         try {
             const savedComment = await newComment.save();
-            res.status(201).json(savedComment);
+            res.status(201).send({ message : "Comment added successfully"});     
         } catch (error) {
-            res.status(500).json({ message: 'Error adding comment', error });
+            res.status(500).send({ message : "Error adding comment"}); 
         }
     }
 };
 
-// Get all comments for a specific post
 export const getCommentsByPost = async (req, res) => {
-    const { postId } = req.params;
+    const postId = req.params.postId;
+    const userId = req.user.userId;
+    console.log(userId)
     try {
-        const comments = await Comment.find({ postId });
-        res.status(200).json(comments);
+        const comments = await Comment.find({ postId: postId })
+            .populate('userId', 'firstName lastName image') // Populate only specific fields
+            .lean();
+        const formattedComments = comments.map(comment => {
+            return {
+                idUser: userId, 
+                idPost: postId, 
+                idComment: comment._id,
+                commentAvatar: comment.userId.image,
+                commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
+                comment: comment.comment
+            };
+        }).filter(comment => comment !== null); // Filter out null comments
+
+        res.json(formattedComments);
+
     } catch (error) {
-        res.status(500).json({ message: 'Error getting comments', error });
+        console.error('Error getting comments for post:', error);
+        res.status(500).send('Error getting comments');
     }
 };
+
+
+export const getCommentsByIdPost = async (postId) => {
+    try {
+        const comments = await Comment.find({ postId: postId })
+            .populate('userId', 'userId firstName lastName image') // Populate only specific fields
+            .lean();
+        return comments.map(comment => {
+            return {
+                idUser: comment.userId._id,
+                idPost: comment.postId._id,
+                idComment : comment._id,
+                commentAvatar: comment.userId.image,
+                commentUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,
+                comment: comment.comment
+            };
+        });
+            
+    } catch (error) {
+        console.error('Error getting comments for post:', error);
+        return []; // Return an empty array on error
+    }
+};
+
 
 // Update a specific comment
 export const updateComment = async (req, res) => {

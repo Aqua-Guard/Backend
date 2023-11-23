@@ -4,6 +4,10 @@ import morgan from "morgan";
 import cors from "cors";
 import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
+<<<<<<< HEAD
+=======
+import actualiteroute from "./routes/actualite.js";
+>>>>>>> 872e978a0420508f9828ce7643c48e072bac2910
 import { errorHandler, notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
 import participationRoutes from "./routes/participation.js";
@@ -12,7 +16,9 @@ import commandeRoutes from "./routes/commande.js";
 import panierRoutes from "./routes/panier.js";
 import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
+import likeRoutes from "./routes/like.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
+import avisroute from "./routes/avis.js";
 
 
 
@@ -45,22 +51,27 @@ app.use(cors()); // Security
 app.use(morgan('dev')); // Logging in the terminal
 app.use(express.json()); // Parsing JSON
 
+app.use(express.static('public'));
 
+app.use(express.urlencoded({ extended: true }));
 
 //routes
 
 app.use('/user', userRoute);
 
-app.use('/events', eventRoutes);//Event routes
-app.use('/posts', authenticateToken, postRoutes);//Post routes
-app.use('/comments', authenticateToken, commentRoutes);//Comment routes
-app.use('/participations', participationRoutes);//Participation routes
-app.use('/produit', produitRoutes);//Produit routes
-app.use('/commande', commandeRoutes);///commande routes
-app.use('/panier', panierRoutes);//panier routes
+app.use('/events',  authenticateToken, eventRoutes); //Event routes
+app.use('/posts', authenticateToken, postRoutes); //Post routes
+app.use('/like',authenticateToken, likeRoutes); //Like routes
+app.use('/comments', authenticateToken, commentRoutes); //Comment routes
+app.use('/participations', authenticateToken, participationRoutes); //Participation routes
+app.use('/produit', produitRoutes);
+app.use('/commande', commandeRoutes);
+app.use('/act',authenticateToken,actualiteroute);//actualite routes
+app.use('/avis',avisroute); // avis routes
+app.use('/event', eventRoutes);
+app.use('/panier', panierRoutes);
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors
-
 
 
 

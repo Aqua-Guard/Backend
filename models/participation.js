@@ -4,12 +4,12 @@ const { Schema, model } = mongoose;
 const participationSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
         required: true
     },
     eventId: {
         type: Schema.Types.ObjectId,
-        ref: "event",
+        ref: "Event",
         required: true
     },
     date: {

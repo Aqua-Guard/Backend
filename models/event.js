@@ -4,13 +4,13 @@ const { Schema, model } = mongoose;
 const eventSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
-        ref: "user",
+        ref: "User",
         required: true
     },
     name: {
         type: String,
         required: true,
-        unique: true
+        
     },
     DateDebut: {
         type: Date,

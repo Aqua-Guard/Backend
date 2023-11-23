@@ -1,9 +1,10 @@
 import express from 'express';
-import { addPost, deletePost, dislikePost, getAllPosts, getAllPostsByUser, likePost, updatePost } from '../controllers/post.js';
+import { addPost, deletePost, getAllPosts, getAllPostsByUser, getPostById, updatePost } from '../controllers/post.js';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
 import { addComment, getCommentsByPost } from '../controllers/comment.js';
+import { addLike, dislikePost, isPostLiked } from '../controllers/like.js';
 
 
 const router = express.Router();
@@ -56,16 +57,20 @@ router
             .withMessage('The image must be a valid URL.'),
         multer,
         updatePost)
-    .delete(deletePost);
+    .delete(deletePost)
+    .get(getPostById);
 
-
+//----------Likes Endpoint----------
 router
     .route('/like/:postId')
-    .put(likePost);
+    .post(addLike);
 router
     .route('/dislike/:postId')
-    .put(dislikePost);
-
+    .post(dislikePost);
+router
+    .route('/isLiked/:postId')
+    .get(isPostLiked);
+//----------------------------------
 router
     .route('/:postId/comments')
     .post(
