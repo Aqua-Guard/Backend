@@ -23,7 +23,7 @@ export function login(req, res) {
                 }
             );
 
-            res.status(200).json({ username: user.username, role: user.role, email: user.email, isActivated: user.isActivated, token });
+            res.status(200).json({userId: user._id, username: user.username, role: user.role, email: user.email, isActivated: user.isActivated, token });
         } else
             res.status(400).json({ message: 'Invalid Credentials!' });
     })
