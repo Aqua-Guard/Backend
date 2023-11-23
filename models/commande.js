@@ -3,6 +3,10 @@ const { Schema, model } = mongoose;
 
 const CommandeSchema = new Schema(
     {
+        idCommande:{
+            type:String,
+            required: true,
+        },
         userId: {
             type: Schema.Types.ObjectId,
             ref: "user",

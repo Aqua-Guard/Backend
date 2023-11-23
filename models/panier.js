@@ -3,6 +3,10 @@ const { Schema, model } = mongoose;
 
 const panierSchema = new Schema(
     {
+        idPanier:{
+            type:String,
+            required: true,
+        },
         Listproduits:{
             type:Array,
             required:true
