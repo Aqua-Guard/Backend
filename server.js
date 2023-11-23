@@ -4,10 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
-<<<<<<< HEAD
-=======
 import actualiteroute from "./routes/actualite.js";
->>>>>>> 872e978a0420508f9828ce7643c48e072bac2910
 import { errorHandler, notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
 import participationRoutes from "./routes/participation.js";
