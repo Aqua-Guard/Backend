@@ -1,10 +1,13 @@
 import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 const produitSchema = new Schema(
-    {
-        _id: {
-            type: Schema.Types.ObjectId,
-            ref: "produit",
+    {   
+        idProduit:{
+            type:String,
+            required: true,
+        },
+        image: {
+            type: String,
             required: true
         },
         name: {

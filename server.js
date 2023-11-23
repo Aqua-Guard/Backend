@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
-
 import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
 import actualiteroute from "./routes/actualite.js";

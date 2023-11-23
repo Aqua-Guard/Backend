@@ -1,6 +1,11 @@
 import express from 'express';
-import { addOnce } from '../controllers/commande.js';
+import { addOnce, passerCommande, getAll, getOne } from '../controllers/commande.js';
 
 const router = express.Router();
-router.post('/', addOnce);
+
+router.post('/ajoutercommande', addOnce);
+router.post('/passercommande', passerCommande);
+router.get('/', getAll);
+router.get('/:id', getOne);
+
 export default router;
