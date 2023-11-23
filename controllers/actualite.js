@@ -6,7 +6,8 @@ Actualite.find()
 .then(async actualites => {
     const transformedevents = await Promise.all(actualites.map(async actualite => {
         return {
-            userId: actualite.userId?.username,
+            idactualite: actualite._id,
+            userId: actualite.userId,
             title: actualite.title,
             description: actualite.description,
             image: actualite.image,
