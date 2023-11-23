@@ -11,6 +11,8 @@ const router = express.Router();
 const filter = new BadWordsFilter();
 
 router
+
+
     .route('/')
 
     .post(multer, [
