@@ -29,6 +29,8 @@ export function getOnce(req, res) {
         res.status(500).json({error:err});
     })
     }
+
+
     export function  addOnce(req,res){
         // const newid=Math.max(...games.map(game=>game.id))+1;
      
