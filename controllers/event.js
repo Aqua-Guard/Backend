@@ -130,22 +130,51 @@ export function getOne(req, res) {
  * @returns 
  */
 export function updateOne(req, res) {
+    const eventId = req.params.id;
 
-    if (!validationResult(req).isEmpty()) {
-        return res.status(400).json({ errors: validationResult(req).array() });
-    } else {
-        Event.findOneAndUpdate({ "_id": req.params.id }, req.body, { new: true })
+    // Check if the request body is empty
+    if (Object.keys(req.body).length === 0) {
+        return res.status(400).json({ error: "No fields provided for update." });
+    }
+
+    // Extract individual fields from req.body
+    const { name, DateDebut, DateFin, Description, lieu } = req.body;
+
+    // Create an object to store the fields that need to be updated
+    const updatedFields = {};
+
+    // Check if each field is present in the request body, and add it to the updatedFields object
+    if (name) updatedFields.name = name;
+    if (DateDebut) updatedFields.DateDebut = DateDebut;
+    if (DateFin) updatedFields.DateFin = DateFin;
+    if (Description) updatedFields.Description = Description;
+    if (lieu) updatedFields.lieu = lieu;
+
+    // Check if the updatedFields object is empty
+    if (Object.keys(updatedFields).length === 0) {
+        return res.status(400).json({ error: "No valid fields provided for update." });
+    }
+
+    
+
+        // Check if a file was uploaded
+        if (req.file) {
+            updatedFields.image = req.file.filename;
+        }
+
+        // Perform the update using findOneAndUpdate
+        Event.findOneAndUpdate({ "_id": eventId }, updatedFields, { new: true })
             .then((updatedEvent) => {
                 if (updatedEvent) {
-                    res.status(200).json({ event: updatedEvent });
+                    res.status(200).json("OK");
                 } else {
                     res.status(404).json({ error: "Event not found." });
                 }
             })
             .catch((err) => res.status(500).json({ error: err.message }));
-    }
 
 }
+
 
 
 /**
