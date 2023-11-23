@@ -1,11 +1,11 @@
 import Produit from "../models/produit.js";
 
 export function addOnce(req, res) {
-  const { _id ,name, nbpoints, quantite, description } = req.body;
+  const { idProduit ,name, nbpoints, quantite, description } = req.body;
   const isEnabled = checkEnabled(quantite);
 
   Produit.create({
-    _id,
+    idProduit,
     name,
     nbpoints,
     quantite,
@@ -30,7 +30,7 @@ export function getAll(req, res) {
 
 
 export function getOne(req, res) {
-  Produit.findById(req.params.id)
+  Produit.findByidproduit(req.params.id)
     .then((produit) => res.status(200).json({ Produit: produit }))
     .catch((error) => {
       console.error(error);
@@ -41,7 +41,7 @@ export function getOne(req, res) {
 export function updateOne(req, res) {
   const { name, nbpoints, quantite, description } = req.body;
 
-  Produit.findByIdAndUpdate(
+  Produit.findByidproduitAndUpdate(
     req.params.id, 
     {
       $set: {
@@ -68,7 +68,7 @@ export function updateOne(req, res) {
 }
 
 export function deleteOne(req, res) {
-  Produit.findByIdAndDelete(req.params.id)
+  Produit.findByidproduitAndDelete(req.params.id)
     .then((deletedProduit) => {
       if (deletedProduit) {
         res.status(200).json({ Produit: deletedProduit });
