@@ -10,8 +10,12 @@ import User from "../models/user.js";
  * @returns 
  */
 export function addOnce(req, res) {
+
     const userId = req.user.userId;
+    console.log(req.body);
+    console.log(req.file);
     if (!validationResult(req).isEmpty()) {
+        console.log({ errors: validationResult(req).array() })
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
         Event.create({
@@ -23,7 +27,7 @@ export function addOnce(req, res) {
             lieu: req.body.lieu,
             image: req.file.filename,
         })
-            .then((newEvent) => res.status(201).json({ event: newEvent }))
+            .then((newEvent) => res.status(201).json("OK"))
             .catch((err) => {
                 res.status(500).json({ error: err.message });
             });
@@ -149,12 +153,15 @@ export function updateOne(req, res) {
  * @param {*} req 
  * @param {*} res 
  */
-export function deleteOne(req, res) {
+export  function deleteOne(req, res) {
 
     Event.findOneAndDelete({ "_id": req.params.id })
-        .then((deletedEvent) => {
+        .then(async (deletedEvent) => {
             if (deletedEvent) {
-                res.status(200).json({ event: deletedEvent });
+                // Delete all participations related to the deleted event
+                await Participation.deleteMany({ eventId: eventId });
+
+                res.status(200).json({ message: "Event and associated participations deleted successfully!" });
             } else {
                 res.status(404).json({ error: "Event not found." });
             }

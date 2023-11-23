@@ -64,6 +64,41 @@ export function getAll(req, res) {
         .catch((err) => res.status(500).json({ error: err }));
 }
 
+/**
+ * Get all participations by user
+ * @param {*} req 
+ * @param {*} res 
+ */
+export async function getAllByUser(req, res) {
+    const userId = req.user.userId;
+    try {
+        const participations = await Participation.find({ userId: userId })
+            .populate('eventId', 'name DateDebut');
+
+        if (participations.length > 0) {
+            const transformedParticipations = await Promise.all(participations.map(async participation => {
+                const event = await Event.findById(participation.eventId);
+            
+
+   
+            return {
+                _id: participation._id,
+                DateEvent: event.DateDebut,
+                Eventname: event.name,
+            };
+     
+            }));
+
+            res.status(200).json(transformedParticipations);
+        } else {
+            res.status(404).json({ error: "No participations found for this user." });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
 
 /**
  * Delete a specific participation
@@ -84,37 +119,7 @@ export function deleteOne(req, res) {
 }
 
 
-/**
- * Get all participations by user
- * @param {*} req 
- * @param {*} res 
- */
-export async function getAllByUser(req, res) {
-    const userId = req.user.userId;
 
-    try {
-        const participations = await Participation.find({ userId: userId })
-            .populate('eventId', 'name DateDebut');
-
-        if (participations.length > 0) {
-            const transformedParticipations = await Promise.all(participations.map(async participation => {
-                const event = await Event.findById(participation.eventId);
-                return {
-                    _id: participation._id,
-                    DateEvent: event.DateDebut,
-                    Eventname: event.name,
-                };
-            }));
-
-            res.status(200).json(transformedParticipations);
-        } else {
-            res.status(404).json({ error: "No participations found for this user." });
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-}
 
 
 export async function isParticipated(req, res) {
