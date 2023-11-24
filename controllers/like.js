@@ -61,7 +61,7 @@ export const isPostLiked = async (req, res) => {
         const like = await Like.findOne({ postId: postId, userId: userId });
 
         // Return true if the like exists, otherwise false
-        res.status(200).json({ isLiked: !!like });
+        res.status(200).json( !!like );
     } catch (error) {
         console.error('Error checking like status:', error);
         res.status(500).json({ error: error.message });
@@ -95,3 +95,17 @@ export const dislikePost = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+export const nbrLikes = async (req, res) => {
+    try {
+        const postId = req.params.postId;
+           
+        const likeCount = await Like.countDocuments({ postId: postId });
+        res.json({ likeCount });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server error");
+    }
+};
+

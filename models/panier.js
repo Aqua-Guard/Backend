@@ -3,10 +3,9 @@ const { Schema, model } = mongoose;
 
 const panierSchema = new Schema(
     {
-        _id:{
-            type: Schema.Types.ObjectId,
-            ref: "panier",
-            required: true
+        idPanier:{
+            type:String,
+            required: true,
         },
         Listproduits:{
             type:Array,

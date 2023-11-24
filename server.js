@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import cors from "cors";
-
 import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
 import actualiteroute from "./routes/actualite.js";
@@ -16,6 +15,7 @@ import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
 import likeRoutes from "./routes/like.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
+import avisroute from "./routes/avis.js";
 
 
 
@@ -63,7 +63,9 @@ app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
-app.use('/act',actualiteroute);
+app.use('/act',authenticateToken,actualiteroute);//actualite routes
+app.use('/avis',avisroute); // avis routes
+app.use('/event', eventRoutes);
 app.use('/panier', panierRoutes);
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors

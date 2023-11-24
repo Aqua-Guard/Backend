@@ -10,7 +10,9 @@ import {
     findUserById,
     sendActivationCode,
     verifyCode,
-    forgotPassword
+    forgotPassword,
+    changePassword,
+    deleteUser
 } from '../controllers/userController.js';
 const router = express.Router();
 
@@ -22,5 +24,7 @@ router.route('/findUserById').get(findUserById);
 router.route('/sendActivationCode').post(sendActivationCode);
 router.route('/verifyCode').post(verifyCode);
 router.route('/forgotPassword').post(forgotPassword);
+router.route('/changePassword').post(changePassword);
+router.route('/deleteUser/:email').delete(deleteUser);
 
 export default router;
