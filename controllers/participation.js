@@ -80,7 +80,7 @@ export async function getAllByUser(req, res) {
                 const event = await Event.findById(participation.eventId);
             
 
-   
+  
             return {
                 _id: participation._id,
                 DateEvent: event.DateDebut,
