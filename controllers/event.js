@@ -1,6 +1,7 @@
 import Event from "../models/event.js";
 import { validationResult } from "express-validator";
 import User from "../models/user.js";
+import Participation from "../models/participation.js";
 
 
 /**
@@ -182,20 +183,24 @@ export function updateOne(req, res) {
  * @param {*} req 
  * @param {*} res 
  */
-export  function deleteOne(req, res) {
+export async function deleteOne(req, res) {
+    const eventId = req.params.id;
 
-    Event.findOneAndDelete({ "_id": req.params.id })
-        .then(async (deletedEvent) => {
-            if (deletedEvent) {
-                // Delete all participations related to the deleted event
-                await Participation.deleteMany({ eventId: eventId });
+    try {
+        // Delete all participations related to the event
+      const deletedparticipants = await Participation.deleteMany({ "eventId": eventId });
 
-                res.status(200).json({ message: "Event and associated participations deleted successfully!" });
-            } else {
-                res.status(404).json({ error: "Event not found." });
-            }
-        })
-        .catch((err) => res.status(500).json({ error: err.message }));
+        // Now, delete the event
+        const deletedEvent = await Event.findOneAndDelete({ "_id": req.params.id });
+
+        if (deletedEvent && deletedparticipants) {
+            res.status(200).json({ message: "Event and associated participations deleted successfully!" });
+        } else {
+            res.status(404).json({ error: "Event not found." });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 }
 
 
