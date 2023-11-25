@@ -43,6 +43,10 @@ router
     .route('/eventByCurrentUser')
     .get(getAllEventsByUser);
 
+
+
+
+
 router
     .route('/:id')
     .get(getOne)
