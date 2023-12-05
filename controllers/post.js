@@ -183,6 +183,7 @@ export function getAllPosts(req, res) {
         .then(async posts => {
             const transformedPosts = await Promise.all(posts.map(async post => {
                 const comments = await getCommentsByIdPost(post._id);
+                const likes = await getLikesByIdPost(post._id);/////////HETHI ZEDTHA FEL IOS W ANDROID LE !!!!!!!!!
                 const  nbComments = await comment.countDocuments({ postId: post._id });
                 return {
                     idPost: post._id, // this is the id of the post
@@ -194,7 +195,8 @@ export function getAllPosts(req, res) {
                     nbLike: post.nbLike,
                     nbComments: nbComments,
                     nbShare: post.nbShare, // Ensure this field exists or is calculated
-                    comments: comments
+                    comments: comments,
+                    likes : likes/////////HETHI ZEDTHA FEL IOS W ANDROID LE !!!!!!!!!
                 };
             }));
             res.status(200).json(transformedPosts);

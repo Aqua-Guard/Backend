@@ -1,11 +1,12 @@
 import Comment from '../models/comment.js';
 import { validationResult } from "express-validator";
-
+import  Post from '../models/post.js';
 
 // Add a comment to a post
 export const addComment = async (req, res) => {
     const userId = req.user.userId;
-    console.log(req.params.postId, userId, req.body.content) // Current user
+   // console.log(req.params.postId, userId, req.body.content) // Current user
+   const postId = req.params.postId;
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
@@ -14,8 +15,16 @@ export const addComment = async (req, res) => {
             userId: userId,
             comment: req.body.comment,
         });
+         try { 
+            // Fetch the post that you want to like
+         const post = await Post.findById(postId);
+         if (!post) {
+             return res.status(404).json({ message: 'Post not found' });
+         }
 
-        try {
+       
+            post.nbComments += 1;
+            await post.save();
             const savedComment = await newComment.save();
             res.status(201).send({ message : "Comment added successfully"});     
         } catch (error) {
