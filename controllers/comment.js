@@ -25,8 +25,21 @@ export const addComment = async (req, res) => {
        
             post.nbComments += 1;
             await post.save();
-            const savedComment = await newComment.save();
-            res.status(201).send({ message : "Comment added successfully"});     
+            await newComment.save();
+
+            const savedComment = await Comment.findById(newComment._id)
+                .populate('userId', 'userId firstName lastName image')
+                .lean();
+
+            const response = {
+                idUser: userId,
+                idPost: savedComment.postId,
+                idComment: savedComment._id,
+                commentAvatar: savedComment.userId.image, // Update with actual logic to get avatar
+                commentUsername: `${savedComment.userId.firstName} ${savedComment.userId.lastName}`, // Update with actual logic to get username
+                comment: savedComment.comment
+            };
+            res.status(201).send(response);     
         } catch (error) {
             res.status(500).send({ message : "Error adding comment"}); 
         }
