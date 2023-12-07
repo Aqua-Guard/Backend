@@ -1,112 +1,71 @@
-import Commandes from "../models/commande.js";
-import Panier from "../models/panier.js";
-import Users from "../models/user.js";
+import Commande from "../models/commande.js";
 import Produit from "../models/produit.js";
 
-
-export function getAll(req, res) {
-  Commande.find()
-    .then((commande) => res.status(200).json({ Commande: commande }))
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to get the products." });
-    });
-}
-
-export function getOne(req, res) {
-  Commande.findById(req.params.id)
-    .then((commande) => res.status(200).json({ Commande: commande }))
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to get the product." });
-    });
-}
-
-export async function addOnce(req, res) {
-  const { panierId, userId } = req.body;
-
+// Create a new "commande"
+// Create a new "commande"
+const createCommande = async (req, res) => {
   try {
-    const panier = await Panier.findOne({ _id: panierId });
-    if (!panier) {
-      res.status(404).json({ error: "Panier not found." });
-      return;
-    }
+    console.log('Received request body:', req.body); // Log the entire request body
+    const { userId, selectedProducts } = req.body;
 
-    let Listproduits=[]
-    for (const produit of panier.Listproduits) {
-      Listproduits.push(produit);
-    }
-    const nbpoints = calculateNbPoints(Listproduits);
 
-    const newCommande = await Commandes.create({
-      panierId,
-      Listproduits,
-      userId,
-      nbpoints,
-    });
-
-    res.status(201).json({ Commande: newCommande });
+    const newCommande = new Commande({userId, selectedProducts, totalPrice });
+    const savedCommande = await newCommande.save();
+    res.status(201).json(savedCommande);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to create the Commande." });
+    res.status(400).json({ error: error.message });
   }
-}
+};
 
-function calculateNbPoints(listProduits) {
-  let nbpoints = 0;
-  for (const produit of listProduits) {
-    nbpoints += produit.nbpoints;
-  }
-  return nbpoints;
-}
-
-export async function passerCommande(req, res) {
-  const userId = req.body.userId;
-  const panierId = req.body.panierId;
-  const commandeId = req.body.commandeId;
+// Add products to a "commande"
+// Add products to a "commande"
+// Add products to a "commande"
+const addProductsToCommande = async (req, res) => {
   try {
-    const commande = await Commandes.findOne({ _id: commandeId });
-    const user = await Users.findOne({ _id: userId });
-    const panier = await Panier.findOne({ _id: panierId });
-    const listProduits = panier.Listproduits;
+    const commande = await Commande.findById(req.params.id);
 
-    if (!commande || !user || !panier) {
-      res.status(404).json({ error: "Commande, User, or Panier not found." });
-      return;
+    if (!commande) {
+      return res.status(404).json({ error: 'Commande not found' });
     }
 
-    const produitIdCounts = {};
+    const { selectedProducts } = req.body;
+    commande.selectedProducts.push(...selectedProducts);
 
-    listProduits.forEach((produitId) => {
-      produitIdCounts[produitId] = (produitIdCounts[produitId] || 0) + 1;
-    });
 
-    console.log("ProduitId Occurrences:", produitIdCounts);
 
-    if (user.nbPts >= commande.nbpoints) {
-      await Panier.deleteOne({ _id: panierId });
-      user.nbPts -= commande.nbpoints;
-      await user.save();
-      for (const produitId in produitIdCounts) {
-        const produit = await Produit.findOne({ _id: produitId });
-        if (produit) {
-          produit.quantite -= produitIdCounts[produitId];
-          await produit.save();
-        }
-      }
-
-      res.status(200).json({ message: "Commande passée avec succès." });
-    } else {
-      res.status(500).json({ error: "Points insuffisants." });
-    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+
+
+// Retrieve a "commande" by its ID
+const getCommandeById = async (req, res) => {
+  try {
+    const commande = await Commande.findById(req.params.id);
+
+    if (!commande) {
+      return res.status(404).json({ error: 'Commande not found' });
+    }
+
+    res.json(commande);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export async function deleteCommandeById(commandeId) {
+  try {
+    await Commande.findByIdAndDelete(commandeId);
+  } catch (error) {
+    console.error('Error deleting command:', error);
+    throw new Error('Error deleting command');
   }
 }
-
-
-
-
-
-
+export default {
+  createCommande,
+  addProductsToCommande,
+  deleteCommandeById,
+  getCommandeById,
+};
