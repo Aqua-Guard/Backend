@@ -10,16 +10,17 @@ export function addPost(req, res) {
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     }else{
+        console.log(req.file)
           const newPost = new Post({
             userId: userId,
             description: req.body.description,
             image: req.file.filename,
         });
         newPost.save()
-            .then(post => res.status(201).json(post))
+            .then(post => res.status(201).json( "Post Created successfully"))
             .catch(err => res.status(500).json({ error: err }));
     }
-} 
+}   
 // Retrieve a post by id
 export function getPost(req, res) {
     Post.findById(req.params.id)
@@ -33,33 +34,29 @@ export function getPost(req, res) {
         .catch(err => res.status(500).json({ error: err }));
 }
 // Update a specific post
+// Update a post
 export function updatePost(req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const postId = req.params.postId;
-    if (!postId) {
-        return res.status(400).json({ error: "Post ID is required." });
-    }
-    Post.findByIdAndUpdate(postId, req.body, { new: true })
-    
+    const userId = req.user.userId;
+    const postId = req.params.postId; // Assuming the post ID is passed as a URL parameter
+    Post.findById(postId)
         .then(post => {
-            if (post) {
-                res.status(200).json(post);
-            } else {
-                res.status(404).json({ error: "Post not found." });
+            if (!post) {
+                return res.status(404).json({ message: 'Post not found' });
             }
+            // Check if the current user is the owner of the post
+            if (post.userId.toString() !== userId) {
+                return res.status(403).json({ message: 'User not authorized to update this post' });
+            }
+            
+            if (req.body.description) {
+                post.description = req.body.description;
+            }
+            return post.save();
         })
-        .catch(err => {
-            // If there's an error related to the cast of the ID (e.g., invalid format), return a 400 error
-            if (err.name === 'CastError') {
-                return res.status(400).json({ error: "Invalid post ID format." });
-            }
-            res.status(500).json({ error: err.message });
-        });
+        .then(updatedPost => res.status(200).json( "Post Updated successfully"))
+        .catch(err => res.status(500).json({ error: err }));
 }
+
 
 // Delete a specific post
 export function deletePost(req, res) {
@@ -70,7 +67,7 @@ export function deletePost(req, res) {
     Post.findByIdAndDelete({ "_id": postId })
         .then(post => {
             if (post) {
-                res.status(200).json({ message: "Post successfully deleted.", post: post });
+                res.status(200).json({ message: "Post successfully deleted."});
             } else {
                 res.status(404).json({ error: "Post not found." });
             }
@@ -83,7 +80,7 @@ export function getAllPostsByUser(req, res) {
     const userId = req.user.userId;
 
     Post.find({ userId: userId })
-        .populate('userId', 'username role image')
+        .populate('userId', 'firstName lastName role image')
         .then(async posts => {
             if (posts.length > 0) {
                 const transformedPosts = await Promise.all(posts.map(async post => {
@@ -91,7 +88,7 @@ export function getAllPostsByUser(req, res) {
                     const nbComments = await comment.countDocuments({ postId: post._id });
                     return {
                         idPost: post._id,
-                        userName: post.userId?.username,
+                        userName: `${post.userId.firstName} ${post.userId.lastName}`,
                         userRole: post.userId?.role,
                         userImage: post.userId?.image,
                         description: post.description,
@@ -182,14 +179,14 @@ export async function dislikePost(req, res) {
 // Retrieve all posts
 export function getAllPosts(req, res) {
     Post.find()
-        .populate('userId', 'username role image') 
+        .populate('userId', 'firstName lastName role image') 
         .then(async posts => {
             const transformedPosts = await Promise.all(posts.map(async post => {
                 const comments = await getCommentsByIdPost(post._id);
                 const  nbComments = await comment.countDocuments({ postId: post._id });
                 return {
                     idPost: post._id, // this is the id of the post
-                    userName: post.userId?.username,
+                    userName: `${post.userId?.firstName} ${post.userId?.lastName}`,
                     userRole: post.userId?.role,
                     userImage: post.userId?.image,
                     description: post.description,
@@ -212,7 +209,7 @@ export function getAllPosts(req, res) {
 export function getPostById(req, res) {
     const postId = req.params.postId;
     Post.findById(postId)
-        .populate('userId', 'username role image')
+        .populate('userId', 'firstName lastName role image')
         .then(async post => {
             if (!post) {
                 return res.status(404).json({ message: 'Post not found' });
@@ -223,7 +220,7 @@ export function getPostById(req, res) {
             const nbComments = await comment.countDocuments({ postId: post._id });
 
             const transformedPost = {              
-                userName: post.userId?.username,
+                userName: `${post.userId.firstName} ${post.userId.lastName}`,
                 userRole: post.userId?.role,
                 userImage: post.userId?.image,
                 description: post.description,

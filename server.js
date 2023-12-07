@@ -62,7 +62,9 @@ app.use('/posts', authenticateToken, postRoutes); //Post routes
 app.use('/like',authenticateToken, likeRoutes); //Like routes
 app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
-app.use('/act',authenticateToken,actualiteroute);//actualite routes
+app.use('/produit', produitRoutes);
+app.use('/commande', commandeRoutes);
+app.use('/act',actualiteroute);//actualite routes
 app.use('/avis',avisroute); // avis routes
 app.use('/event', eventRoutes);
 app.use('/produit', produitRoutes);

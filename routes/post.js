@@ -11,6 +11,8 @@ const router = express.Router();
 const filter = new BadWordsFilter();
 
 router
+
+
     .route('/')
 
     .post(multer, [
@@ -25,8 +27,6 @@ router
                 }
                 return true;
             })
-        ,
-
     ],
         addPost)
     .get(getAllPosts);
@@ -37,7 +37,7 @@ router
 
 router
     .route('/:postId')
-    .put(
+    .put(multer,[
         body('description')
             .notEmpty()
             .trim()
@@ -49,13 +49,7 @@ router
                 }
                 return true;
             })
-        ,
-        body('image')
-            .notEmpty()
-            .trim()
-            .isURL()
-            .withMessage('The image must be a valid URL.'),
-        multer,
+         ] ,
         updatePost)
     .delete(deletePost)
     .get(getPostById);
@@ -87,5 +81,6 @@ router
             }),
         addComment)
     .get(getCommentsByPost)
+
 
 export default router;

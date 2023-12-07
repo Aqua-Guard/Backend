@@ -23,7 +23,7 @@ export function login(req, res) {
                 }
             );
 
-            res.status(200).json({ username: user.username, role: user.role, email: user.email, isActivated: user.isActivated, token });
+            res.status(200).json({ id: user._id, username: user.username, image: user.image, nbPts: user.nbPts, role: user.role, email: user.email, isActivated: user.isActivated, token });
         } else
             res.status(400).json({ message: 'Invalid Credentials!' });
     })
@@ -120,9 +120,29 @@ export function findUserById(req, res) {
     });
 };
 
-export function sendActivationCode(req, res) {
+export async function sendActivationCode(req, res) {
     try {
         const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
+        const email = req.body.email
+        const user = await User.findOne({ email });
+        const username = user.username;
+
+        const htmlString = `
+            <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+                <table width='100%' cellpadding='0' style='max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                    <tr>
+                        <td style='padding: 20px;'>
+                            <h2 style='color: #333;'>Activation Code Email</h2>
+                            <p>Dear ${username},</p>
+                            <p>Your activation code is: <strong style='color: #009688;'>${resetCode}</strong></p>
+                            <p>Please use this code to reset your password.</p>
+                            <p>If you did not request this code, please disregard this email.</p>
+                            <p>Thank you!</p>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+        `;
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -134,7 +154,7 @@ export function sendActivationCode(req, res) {
             from: process.env.SENDER_EMAIL,
             to: req.body.email,
             subject: "Your Activation Code ✔",
-            text: resetCode,
+            html: htmlString,
         });
 
         User.updateOne({
@@ -180,7 +200,6 @@ export async function forgotPassword(req, res) {
         res.status(500).json({ message: "2 passwords don't match" })
 };
 
-
 export async function changePassword(req, res) {
     const { email, newPassword, confirmPassword, oldPassword } = req.body;
 
@@ -208,3 +227,40 @@ export async function deleteUser(req, res) {
             return res.status(404).json({ message: 'user not found' });
         });
 };
+
+export async function updateProfile(req, res) {
+    const username = req.params.username;
+
+    const image = req.file.filename;
+    await User.findOne({ username })
+        .then(exists => {
+            if (exists) {
+                return User.updateOne({
+                        username: req.body.username,
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName,
+                        email: req.body.email,
+                        image: image,
+                    })
+                    .then(user => {
+                        res.status(201).json({
+                            username: req.body.username,
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            email: req.body.email,
+                            image: image,
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        res.status(500).json({ message: err });
+                    });
+            } else {
+                res.status(500).json({ message: "User does not exist" });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: err });
+        });
+}
