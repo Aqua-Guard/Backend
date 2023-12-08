@@ -5,6 +5,8 @@ import cors from "cors";
 import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
 import actualiteroute from "./routes/actualite.js";
+import reclamationRoutes from "./routes/reclamation.js";
+import discutionRoutes from "./routes/discution.js";
 import { errorHandler, notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
 import participationRoutes from "./routes/participation.js";
@@ -64,6 +66,8 @@ app.use('/participations', authenticateToken, participationRoutes); //Participat
 app.use('/produit', produitRoutes);
 app.use('/commande', commandeRoutes);
 app.use('/act',actualiteroute);//actualite routes
+app.use('/reclamation',reclamationRoutes);//reclaation routes
+app.use('/discution',discutionRoutes);//discution routes
 app.use('/avis',avisroute); // avis routes
 app.use('/event', eventRoutes);
 app.use('/panier', panierRoutes);
