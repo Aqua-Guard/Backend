@@ -38,7 +38,8 @@ export function getPost(req, res) {
 // Update a post
 export function updatePost(req, res) {
     const userId = req.user.userId;
-    const postId = req.params.postId; // Assuming the post ID is passed as a URL parameter
+    const postId = req.params.postId; 
+    console.log("--------------------" +req.body.description)// Assuming the post ID is passed as a URL parameter
     Post.findById(postId)
         .then(post => {
             if (!post) {
@@ -48,7 +49,6 @@ export function updatePost(req, res) {
             if (post.userId.toString() !== userId) {
                 return res.status(403).json({ message: 'User not authorized to update this post' });
             }
-            
             if (req.body.description) {
                 post.description = req.body.description;
             }
