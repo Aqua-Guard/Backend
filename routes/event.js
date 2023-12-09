@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce, getAllEvents, getOne, updateOne, deleteOne, getAllEventsByUser, getAllEventsWithParticipations } from '../controllers/event.js';
+import { addOnce, getAllEvents, getOne, updateOne, deleteOne, getAllEventsByUser, getAllEventsWithParticipations,getEventsNBParticipants } from '../controllers/event.js';
 import { body } from 'express-validator';
 import multer from '../middlewares/multer-config-event.js';
 import user from '../models/user.js';
@@ -70,6 +70,10 @@ router
 router
     .route('/admin')
     .get(isAdmin, getAllEventsWithParticipations);
+    
+router
+    .route('/admin/stats')
+    .get(isAdmin, getEventsNBParticipants);
 
 
 
