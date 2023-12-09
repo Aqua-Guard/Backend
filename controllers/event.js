@@ -213,10 +213,10 @@ export function getAllEventsWithParticipations(req, res) {
                 events.map(async (event) => {
                     console.log('Event ID:', event._id);
                     const participations = await Participation.find({ eventId: event._id })
-                      .populate('userId', 'username image')
-                      .select('userId');
+                        .populate('userId', 'username image')
+                        .select('userId');
                     console.log('Participations:', participations);
-                    
+
 
                     const participants = participations.map((participation) => {
                         return {
@@ -251,6 +251,38 @@ export function getAllEventsWithParticipations(req, res) {
             res.status(500).json({ error: err });
         });
 }
+
+
+export function getEventsNBParticipants(req, res) {
+    Event.find()
+        .sort({ createdAt: -1 }) // Sort events by date in descending order
+        .limit(7) // Limit the result to 7 events
+        .then(async (events) => {
+            const transformedEvents = await Promise.all(
+                events.map(async (event) => {
+                    const participations = await Participation.find({ eventId: event._id })
+                        .populate('userId', 'username image')
+                        .select('userId');
+
+                    const nbParticipants = participations.length; // Calculate the number of participants
+
+                    return {
+                        idEvent: event._id,
+                        eventName: event.name,
+                        nbParticipants: nbParticipants,
+                    };
+                })
+            );
+
+            res.status(200).json(transformedEvents);
+        })
+        .catch((err) => {
+            console.error('Error fetching events:', err);
+            res.status(500).json({ error: err });
+        });
+}
+
+
 
 
 
