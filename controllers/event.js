@@ -283,6 +283,34 @@ export function getEventsNBParticipants(req, res) {
 }
 
 
+export function addOnceByAdmin(req, res) {
+
+    console.log(req.body);
+    console.log(req.file);
+    if (!validationResult(req).isEmpty()) {
+        console.log({ errors: validationResult(req).array() })
+        return res.status(400).json({ errors: validationResult(req).array() });
+    } else {
+        Event.create({
+            userId: req.body.userId,
+            name: req.body.name,
+            DateDebut: req.body.DateDebut,
+            DateFin: req.body.DateFin,
+            Description: req.body.Description,
+            lieu: req.body.lieu,
+            image: req.file.filename,
+        })
+            .then((newEvent) => res.status(201).json("Event Added Successfully!"))
+            .catch((err) => {
+                res.status(500).json({ error: err.message });
+            });
+    }
+
+}
+
+
+
+
 
 
 

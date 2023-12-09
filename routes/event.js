@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce, getAllEvents, getOne, updateOne, deleteOne, getAllEventsByUser, getAllEventsWithParticipations,getEventsNBParticipants } from '../controllers/event.js';
+import { addOnce, getAllEvents, getOne, updateOne, deleteOne, getAllEventsByUser, getAllEventsWithParticipations,getEventsNBParticipants,addOnceByAdmin } from '../controllers/event.js';
 import { body } from 'express-validator';
 import multer from '../middlewares/multer-config-event.js';
 import user from '../models/user.js';
@@ -69,8 +69,16 @@ router
 
 router
     .route('/admin')
-    .get(isAdmin, getAllEventsWithParticipations);
-    
+    .get(isAdmin, getAllEventsWithParticipations)
+    .post(isAdmin,multer, [
+        body("name").isLength({ min: 3, max: 30 }).withMessage("Name must be between 3 and 30 characters long."),
+        body("DateDebut").custom(isDateDebutBeforeDateFin).custom(isDateDebutValid).withMessage("DateDebut must be a valid date."),
+        body("DateFin").custom(isDateFinAfterDateDebut).withMessage("DateFin must be a valid date."),
+        body("Description").isLength({ min: 10, max: 500 }).withMessage("Description must be between 10 and 100 characters long."),
+        body("lieu").isLength({ min: 3, max: 30 }).withMessage()
+    ],
+        addOnceByAdmin);
+
 router
     .route('/admin/stats')
     .get(isAdmin, getEventsNBParticipants);
