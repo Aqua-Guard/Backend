@@ -156,23 +156,23 @@ export function updateOne(req, res) {
         return res.status(400).json({ error: "No valid fields provided for update." });
     }
 
-    
 
-        // Check if a file was uploaded
-        if (req.file) {
-            updatedFields.image = req.file.filename;
-        }
 
-        // Perform the update using findOneAndUpdate
-        Event.findOneAndUpdate({ "_id": eventId }, updatedFields, { new: true })
-            .then((updatedEvent) => {
-                if (updatedEvent) {
-                    res.status(200).json("OK");
-                } else {
-                    res.status(404).json({ error: "Event not found." });
-                }
-            })
-            .catch((err) => res.status(500).json({ error: err.message }));
+    // Check if a file was uploaded
+    if (req.file) {
+        updatedFields.image = req.file.filename;
+    }
+
+    // Perform the update using findOneAndUpdate
+    Event.findOneAndUpdate({ "_id": eventId }, updatedFields, { new: true })
+        .then((updatedEvent) => {
+            if (updatedEvent) {
+                res.status(200).json("OK");
+            } else {
+                res.status(404).json({ error: "Event not found." });
+            }
+        })
+        .catch((err) => res.status(500).json({ error: err.message }));
 
 }
 
@@ -188,7 +188,7 @@ export async function deleteOne(req, res) {
 
     try {
         // Delete all participations related to the event
-      const deletedparticipants = await Participation.deleteMany({ "eventId": eventId });
+        const deletedparticipants = await Participation.deleteMany({ "eventId": eventId });
 
         // Now, delete the event
         const deletedEvent = await Event.findOneAndDelete({ "_id": req.params.id });
@@ -202,5 +202,56 @@ export async function deleteOne(req, res) {
         res.status(500).json({ error: err.message });
     }
 }
+
+
+
+export function getAllEventsWithParticipations(req, res) {
+    Event.find()
+        .populate('userId', 'username role image')
+        .then(async (events) => {
+            const transformedEvents = await Promise.all(
+                events.map(async (event) => {
+                    console.log('Event ID:', event._id);
+                    const participations = await Participation.find({ eventId: event._id })
+                      .populate('userId', 'username image')
+                      .select('userId');
+                    console.log('Participations:', participations);
+                    
+
+                    const participants = participations.map((participation) => {
+                        return {
+                            userId: participation.userId?._id,
+                            username: participation.userId?.username ?? '',
+                            image: participation.userId?.image ?? '',
+                        };
+                    });
+
+                    console.log('Event ID:', event._id);
+                    console.log('Participants:', participations);
+
+                    return {
+                        idEvent: event._id,
+                        userName: event.userId?.username,
+                        userImage: event.userId?.image,
+                        eventName: event.name,
+                        description: event.Description,
+                        eventImage: event.image,
+                        DateDebut: event.DateDebut,
+                        DateFin: event.DateFin,
+                        lieu: event.lieu,
+                        participants: participants,
+                    };
+                })
+            );
+
+            res.status(200).json(transformedEvents);
+        })
+        .catch((err) => {
+            console.error('Error fetching events:', err);
+            res.status(500).json({ error: err });
+        });
+}
+
+
 
 
