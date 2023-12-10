@@ -20,5 +20,5 @@ export default multer({
             callback(null, Date.now() + "." + extension);
         },
     }),
-    limits: 512 * 1024,
+   // limits: 512 * 1024,
 }).single("image");

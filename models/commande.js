@@ -1,3 +1,4 @@
+/*
 import mongoose from 'mongoose';
 import Produit from '../models/produit.js';
 import User from '../models/user.js';
@@ -67,4 +68,4 @@ commandeSchema.pre('save', async function (next) {
 
 
 
-export default model('Commande', commandeSchema);
+export default model('Commande', commandeSchema);*/

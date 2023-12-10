@@ -1,4 +1,4 @@
-import express from "express";
+/*import express from "express";
 import Commande from "../models/commande.js";
 import Produit from"../models/produit.js";
 import stripe from "stripe";
@@ -14,7 +14,7 @@ import { deleteCommandeById } from '../controllers/commande.js';
 } from "../controllers/user.js";*/
 
 
-const transporter = nodemailer.createTransport({
+/*const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'arafetksiksi7@gmail.com', // replace with your email
@@ -214,4 +214,4 @@ function formatCartDetails(selectedProducts) {
 
 
 
-export default router;
+export default router;*/

@@ -1,4 +1,4 @@
-import Actualite from '../models/actualite.js';
+/*import Actualite from '../models/actualite.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose'; 
 import { OpenAI} from 'openai';
@@ -101,4 +101,4 @@ export function getOnce(req, res) {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
           }
-      }
+      }*/

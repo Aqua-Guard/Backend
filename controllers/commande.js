@@ -1,4 +1,4 @@
-import Commande from "../models/commande.js";
+/*import Commande from "../models/commande.js";
 import Produit from "../models/produit.js";
 
 // Create a new "commande"
@@ -68,4 +68,4 @@ export default {
   addProductsToCommande,
   deleteCommandeById,
   getCommandeById,
-};
+};*/

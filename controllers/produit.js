@@ -1,5 +1,4 @@
 import { validationResult } from "express-validator";
-
 import Produit from "../models/produit.js";
 
 export function getAll(req, res) {
@@ -13,7 +12,8 @@ export function getAll(req, res) {
           description: docs[i].description,
           price: docs[i].price,
           quantity: docs[i].quantity,
-          image: docs[i].image.filename,
+          image: docs[i].image,
+          category: docs[i].category,
         });
       }
       res.status(200).json(list);
@@ -32,7 +32,8 @@ export function addOnce(req, res) {
       description: req.body.description,
       price: req.body.price,
       quantity: req.body.quantity,
-      image: `http://192.168.1.166:9090/img/${req.file.filename}`,
+      category: req.body.category,
+      image: req.file.filename,
     })
       .then((newProduit) => {
         res.status(200).json({
@@ -41,6 +42,7 @@ export function addOnce(req, res) {
           price: newProduit.price,
           quantity: newProduit.quantity,
           image: newProduit.image,
+          category: newProduit.category,
         });
       })
       .catch((err) => {
