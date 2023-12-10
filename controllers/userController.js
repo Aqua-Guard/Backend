@@ -106,9 +106,9 @@ export function registerFlutter(req, res) {
 
 export function getUsers(req, res) {
     User.find().then(user => {
-        res.status(200).json({ status: '200', data: user });
+        res.status(200).json(user);
     }).catch(err => {
-        res.status(500).json({ status: '400', message: err })
+        res.status(500).json({ message: err })
     });
 };
 
