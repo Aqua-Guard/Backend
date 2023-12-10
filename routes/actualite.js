@@ -16,7 +16,7 @@ actualiteroute
 
  actualiteroute
  .route('/search')
- .get(searchActualites);
+ .post(searchActualites);
 
 
 

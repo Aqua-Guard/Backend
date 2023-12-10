@@ -13,7 +13,7 @@ export default multer({
         destination: (req, file, callback) => {
             const __dirname = dirname(fileURLToPath(
                 import.meta.url));
-            callback(null, join(__dirname, "../public/images/actualite"));
+            callback(null, join(__dirname, "../public/images/reclamation"));
         },
         filename: (req, file, callback) => {
             const extension = MIME_TYPES[file.mimetype];

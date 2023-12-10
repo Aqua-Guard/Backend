@@ -1,7 +1,8 @@
 import Participation from "../models/participation.js";
-import { validationResult } from "express-validator";
-import Event from '../models/event.js'; 
 import User from '../models/user.js';
+import Event from '../models/event.js'; 
+
+
 
 /**
  * Add a new participation
@@ -153,3 +154,23 @@ export function deleteParticipation(req, res) {
         })
         .catch((err) => res.status(500).json({ error: err }));
 }
+
+export function deleteParticipationAdmin(req, res) {
+    const eventId = req.params.eventId;
+    const userId = req.params.userId;
+
+    Participation.findOneAndDelete({ eventId: eventId, userId: userId })
+        .then((participation) => {
+            if (participation) {
+                res.status(200).json({ message: "participation deleted successfully." });
+            } else {
+                res.status(404).json({ error: "participation not found." });
+            }
+        })
+        .catch((err) => res.status(500).json({ error: err }));
+}
+
+
+
+
+
