@@ -1,4 +1,4 @@
-/*import express from 'express';
+import express from 'express';
 import {getAll,getOnce,addOnce,searchActualites}from '../controllers/actualite.js';
 import multer from '../middlewares/multer-config-actualite.js';
 const actualiteroute =express.Router();
@@ -22,4 +22,4 @@ actualiteroute
 
  
 
-export default actualiteroute;*/
+export default actualiteroute;
