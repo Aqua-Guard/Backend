@@ -10,13 +10,6 @@ const titlesToSearch = [];
 const openai =new OpenAI({
   apiKey : process.env.OPENAI_API_KEY,
 });
-
-
-
-
-
-
-
 export function getAll(req,res){
 Actualite.find()
 .then(async actualites => {
@@ -109,6 +102,5 @@ export function getOnce(req, res) {
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
-        }
-    }
-    
+          }
+      }
