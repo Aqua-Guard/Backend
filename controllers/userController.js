@@ -264,3 +264,28 @@ export async function updateProfile(req, res) {
             res.status(500).json({ message: err });
         });
 }
+
+
+export function getPartenaires(req, res) {
+    User.find({ role: "partenaire" })
+        .then(users => {
+            if (users.length === 0) {
+                return res.status(404).json({message: 'No users found with the specified role' });
+            }
+            const transformedUsers = users.map(user => {
+                return {
+                    id: user._id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                };
+            });
+            
+            res.status(200).json(transformedUsers);
+        })
+        .catch(err => {
+            res.status(500).json({ message: err });
+        });
+}
+
+
+
