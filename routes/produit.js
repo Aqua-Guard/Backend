@@ -4,7 +4,7 @@ import { body, query } from "express-validator";
 import multer from "../middlewares/multer-config-produit.js";
 import Produit from "../models/produit.js";
 
-import { getAll, addOnce, getOnce, putOnce, getRandomProduct } from "../controllers/produit.js";
+import { getAll, addOnce, getOnce, putOnce } from "../controllers/produit.js";
 
 const router = express.Router();
 router.get("/detail", [
@@ -45,6 +45,7 @@ router
   .get(getAll)
   .post(
     multer,[
+    body("image",5 * 200 * 200),
     body("name").isLength({ min: 5 }),
     body("description").isLength({ min: 5 }),
     body("price").isNumeric(),
