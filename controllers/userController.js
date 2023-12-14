@@ -33,9 +33,13 @@ export function login(req, res) {
 };
 
 export function registerAndroidIOS(req, res) {
+    console.log(req.body.username)
+    console.log(req.file)
     const username = req.body.username;
-    // console.log(req.file)
-    // const image = req.file.filename;
+    const image = req.file.filename;
+    // console.log(image)
+    console.log(username)
+
     User.findOne({ username })
         .then(exists => {
             if (exists) {
@@ -51,7 +55,7 @@ export function registerAndroidIOS(req, res) {
                     isBlocked: 0,
                     resetCode: 0,
                     nbPts: 0,
-                    image: 'profile_pic.png',
+                    image: image,
                     role: "consommateur"
                 })
                 .then(user => {
@@ -124,6 +128,7 @@ export async function sendActivationCode(req, res) {
     try {
         const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
         const email = req.body.email
+        console.log(email)
         const user = await User.findOne({ email });
         const username = user.username;
 
@@ -228,6 +233,16 @@ export async function deleteUser(req, res) {
         });
 };
 
+export async function deleteUserById(req, res) {
+    await User.findOneAndDelete(req.params.id)
+        .then(data => {
+            return res.status(200).json({ message: "deleted" });
+        })
+        .catch(err => {
+            return res.status(404).json({ message: 'user not found' });
+        });
+};
+
 export async function updateProfile(req, res) {
     const username = req.params.username;
 
@@ -270,7 +285,7 @@ export function getPartenaires(req, res) {
     User.find({ role: "partenaire" })
         .then(users => {
             if (users.length === 0) {
-                return res.status(404).json({message: 'No users found with the specified role' });
+                return res.status(404).json({ message: 'No users found with the specified role' });
             }
             const transformedUsers = users.map(user => {
                 return {
@@ -279,13 +294,10 @@ export function getPartenaires(req, res) {
                     lastName: user.lastName,
                 };
             });
-            
+
             res.status(200).json(transformedUsers);
         })
         .catch(err => {
             res.status(500).json({ message: err });
         });
 }
-
-
-
