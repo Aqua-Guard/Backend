@@ -10,6 +10,7 @@ export const getLikesByIdPost = async (postId) => {
             .lean();
         return likes.map(comment => {
             return {
+                idLike : comment._id, // hethi zetha 
                 likeAvatar: comment.userId.image,
                 likeUsername: `${comment.userId.firstName} ${comment.userId.lastName}`,             
             };
