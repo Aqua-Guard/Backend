@@ -86,6 +86,7 @@ export function getAllPostsByUser(req, res) {
                 const transformedPosts = await Promise.all(posts.map(async post => {
                     const comments = await getCommentsByIdPost(post._id);
                     const nbComments = await comment.countDocuments({ postId: post._id });
+                    const likes = await getLikesByIdPost(post._id);/////////HETHI ZEDTHA FEL IOS W ANDROID LE !!!!!!!!!
                     return {
                         idPost: post._id,
                         userName: `${post.userId.firstName} ${post.userId.lastName}`,
@@ -96,7 +97,8 @@ export function getAllPostsByUser(req, res) {
                         nbLike: post.nbLike,
                         nbComments: nbComments,
                         nbShare: post.nbShare,
-                        comments: comments
+                        comments: comments,
+                        likes : likes/////////HETHI ZEDTHA FEL IOS W ANDROID LE !!!!!!!!!
                     };
                 }));
                 res.status(200).json(transformedPosts);
@@ -183,6 +185,7 @@ export function getAllPosts(req, res) {
         .then(async posts => {
             const transformedPosts = await Promise.all(posts.map(async post => {
                 const comments = await getCommentsByIdPost(post._id);
+                const likes = await getLikesByIdPost(post._id);/////////HETHI ZEDTHA FEL IOS W ANDROID LE !!!!!!!!!
                 const  nbComments = await comment.countDocuments({ postId: post._id });
                 return {
                     idPost: post._id, // this is the id of the post
@@ -194,7 +197,8 @@ export function getAllPosts(req, res) {
                     nbLike: post.nbLike,
                     nbComments: nbComments,
                     nbShare: post.nbShare, // Ensure this field exists or is calculated
-                    comments: comments
+                    comments: comments,
+                    likes : likes/////////HETHI ZEDTHA FEL IOS W ANDROID LE !!!!!!!!!
                 };
             }));
             res.status(200).json(transformedPosts);
@@ -205,6 +209,35 @@ export function getAllPosts(req, res) {
         });
 }
 
+export function getAllPostsAdmin(req, res) {
+    Post.find()
+        .populate('userId', 'firstName lastName role image') 
+        .then(async posts => {
+            const transformedPosts = await Promise.all(posts.map(async post => {
+                const comments = await getCommentsByIdPost(post._id);
+                const  nbComments = await comment.countDocuments({ postId: post._id });
+                const likes = await getLikesByIdPost(post._id);
+                return {
+                    idPost: post._id, // this is the id of the post
+                    userName: `${post.userId?.firstName} ${post.userId?.lastName}`,
+                    userRole: post.userId?.role,
+                    userImage: post.userId?.image,
+                    description: post.description,
+                    postImage: post.image,
+                    nbLike: post.nbLike,
+                    nbComments: nbComments,
+                    nbShare: post.nbShare, // Ensure this field exists or is calculated
+                    comments: comments,
+                    likes:likes,
+                };
+            }));
+            res.status(200).json(transformedPosts);
+        })
+        .catch(err => {
+            console.error('Error fetching posts:', err);
+            res.status(500).json({ error: err });
+        });
+}
 // Retrieve a single post by ID
 export function getPostById(req, res) {
     const postId = req.params.postId;
@@ -238,4 +271,56 @@ export function getPostById(req, res) {
             console.error('Error fetching post:', err);
             res.status(500).json({ error: err });
         });
+
+        
+        
+}
+//------------------------------------
+// Function to get the number of posts per day of the week
+export function GetPostPerWeek(req, res) {
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay() + (startOfWeek.getDay() === 0 ? -6 : 1)); // Set to Monday of this week
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6); // Set to Sunday of this week
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    Post.aggregate([
+        { $match: { createdAt: { $gte: startOfWeek, $lte: endOfWeek } } },
+        { 
+            $group: {
+                _id: { $dayOfWeek: '$createdAt' },
+                count: { $sum: 1 }
+            }
+        },
+        { 
+            $project: {
+                dayOfWeek: '$_id',
+                count: 1,
+                _id: 0
+            }
+        },
+        { $sort: { dayOfWeek: 1 } } // Optional: sort by day of week
+    ])
+    .then(result => {
+        // Optional: Format the result to include days with zero posts
+        const formattedResult = formatResult(result);
+        res.json(formattedResult);
+    })
+    .catch(err => res.status(500).json({ error: err }));
+}
+
+// Helper function to format the result
+function formatResult(result) {
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const formatted = [];
+
+    daysOfWeek.forEach((day, index) => {
+        const dayIndex = index + 1;
+        const found = result.find(item => item.dayOfWeek === dayIndex);
+        formatted.push({ day: day, count: found ? found.count : 0 });
+    });
+
+    return formatted;
 }

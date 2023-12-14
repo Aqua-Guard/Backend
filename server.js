@@ -7,7 +7,6 @@ import userRoute from "./routes/userRoute.js";
 import dotenv from 'dotenv';
 import reclamationRoutes from "./routes/reclamation.js";
 import discutionRoutes from "./routes/discution.js";
-import actualiteroute from "./routes/actualite.js";
 import { errorHandler, notFoundError } from "./middlewares/error-handler.js";
 import eventRoutes from "./routes/event.js";
 import participationRoutes from "./routes/participation.js";
@@ -47,6 +46,8 @@ app.use('/user', userRoute);
 app.use('/events',  authenticateToken, eventRoutes); //Event routes
 app.use('/posts', authenticateToken, postRoutes); //Post routes
 app.use('/like',authenticateToken, likeRoutes); //Like routes
+
+
 app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);

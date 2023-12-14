@@ -1,5 +1,5 @@
 import express from 'express';
-import { addPost, deletePost, getAllPosts, getAllPostsByUser, getPostById, updatePost } from '../controllers/post.js';
+import { GetPostPerWeek, addPost, deletePost, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, updatePost } from '../controllers/post.js';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
@@ -34,7 +34,13 @@ router
 router
     .route('/postByCurrentUser')
     .get(getAllPostsByUser);
-
+router
+    .route('/getAdmin')
+    .get(getAllPostsAdmin);
+    
+router
+    .route('/PostPerWeekstat')
+    .get(GetPostPerWeek);
 router
     .route('/:postId')
     .put(multer,[
