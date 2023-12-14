@@ -14,6 +14,7 @@ import produitRoutes from "./routes/produit.js";
 import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
 import likeRoutes from "./routes/like.js";
+import actualiteroute from "./routes/actualite.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
 import avisroute from "./routes/avis.js";
 
