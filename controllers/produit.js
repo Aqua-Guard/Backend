@@ -1,87 +1,114 @@
+import { validationResult } from "express-validator";
 import Produit from "../models/produit.js";
 
-export function addOnce(req, res) {
-  const { idProduit ,name, nbpoints, quantite, description } = req.body;
-  const isEnabled = checkEnabled(quantite);
-
-  Produit.create({
-    idProduit,
-    name,
-    nbpoints,
-    quantite,
-    description,
-    isEnabled
-  })
-    .then((newProduit) => res.status(201).json({ Produit: newProduit }))
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to create the product." });
-    });
-}
-
 export function getAll(req, res) {
-  Produit.find()
-    .then((produits) => res.status(200).json({ Produits: produits }))
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to get the products." });
-    });
-}
-
-
-export function getOne(req, res) {
-  Produit.findByidproduit(req.params.id)
-    .then((produit) => res.status(200).json({ Produit: produit }))
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to get the product." });
-    });
-}
-
-export function updateOne(req, res) {
-  const { name, nbpoints, quantite, description } = req.body;
-
-  Produit.findByidproduitAndUpdate(
-    req.params.id, 
-    {
-      $set: {
-        name,
-        nbpoints,
-        quantite,
-        description,
-        isEnabled: checkEnabled(quantite),
-      },
-    },
-    { new: true } // Return the updated document
-  )
-    .then((updatedProduit) => {
-      if (updatedProduit) {
-        res.status(200).json({ Produit: updatedProduit });
-      } else {
-        res.status(404).json({ error: "Product not found." });
+  Produit.find({})
+    .then((docs) => {
+      let list = [];
+      for (let i = 0; i < docs.length; i++) {
+        list.push({
+          _id: docs[i]._id,
+          name: docs[i].name,
+          description: docs[i].description,
+          price: docs[i].price,
+          quantity: docs[i].quantity,
+          image: docs[i].image,
+          category: docs[i].category,
+        });
       }
+      res.status(200).json(list);
     })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to update the product." });
+    .catch((err) => {
+      res.status(500).json({ error: err });
     });
 }
 
-export function deleteOne(req, res) {
-  Produit.findByidproduitAndDelete(req.params.id)
-    .then((deletedProduit) => {
-      if (deletedProduit) {
-        res.status(200).json({ Produit: deletedProduit });
-      } else {
-        res.status(404).json({ error: "Product not found." });
+export function addOnce(req, res) {
+  if (!validationResult(req).isEmpty()) {
+    res.status(400).json({ errors: validationResult(req).array() });
+  } else {
+    Produit.create({
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      category: req.body.category,
+      image: req.file.filename,
+    })
+      .then((newProduit) => {
+        res.status(200).json({
+          name: newProduit.name,
+          description: newProduit.description,
+          price: newProduit.price,
+          quantity: newProduit.quantity,
+          image: newProduit.image,
+          category: newProduit.category,
+        });
+      })
+      .catch((err) => {
+        res.status(500).json({ error: err });
+      });
+  }
+}
+
+export function getOnce(req, res) {
+  Produit.findById(req.params.id)
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+}
+
+export function putOnce(req, res) {
+  let newProduit = {};
+  if(req.file == undefined) {
+    newProduit = {
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      quantity: req.body.quantity
+    }
+  }
+  else {
+    newProduit = {
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      image: `${req.protocol}://${req.get("host")}/img/${req.file.filename}`
+    }
+  }
+  Produit.findByIdAndUpdate(req.params.id, newProduit)
+    .then((doc1) => {
+      Produit.findById(req.params.id)
+        .then((doc2) => {
+          res.status(200).json(doc2);
+        })
+        .catch((err) => {
+          res.status(500).json({ error: err });
+        });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+}
+export function getRandomProduct(req, res) {
+  Produit.aggregate([{ $sample: { size: 1 } }])
+    .exec((err, randomProduct) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
       }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: "Failed to delete the product." });
+
+      if (randomProduct.length === 0) {
+        return res.status(404).json({ error: "No random product found" });
+      }
+
+      res.status(200).json(randomProduct[0]);
     });
 }
 
-function checkEnabled(quantite) {
-  return quantite === 0 ? false : true;
-}
+
+

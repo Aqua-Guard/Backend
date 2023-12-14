@@ -106,9 +106,9 @@ export function registerFlutter(req, res) {
 
 export function getUsers(req, res) {
     User.find().then(user => {
-        res.status(200).json({ status: '200', data: user });
+        res.status(200).json(user);
     }).catch(err => {
-        res.status(500).json({ status: '400', message: err })
+        res.status(500).json({ message: err })
     });
 };
 
@@ -264,3 +264,28 @@ export async function updateProfile(req, res) {
             res.status(500).json({ message: err });
         });
 }
+
+
+export function getPartenaires(req, res) {
+    User.find({ role: "partenaire" })
+        .then(users => {
+            if (users.length === 0) {
+                return res.status(404).json({message: 'No users found with the specified role' });
+            }
+            const transformedUsers = users.map(user => {
+                return {
+                    id: user._id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                };
+            });
+            
+            res.status(200).json(transformedUsers);
+        })
+        .catch(err => {
+            res.status(500).json({ message: err });
+        });
+}
+
+
+

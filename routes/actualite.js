@@ -1,5 +1,5 @@
 import express from 'express';
-import {getAll,getOnce,addOnce}from '../controllers/actualite.js';
+import {getAll,getOnce,addOnce,searchActualites}from '../controllers/actualite.js';
 import multer from '../middlewares/multer-config-actualite.js';
 const actualiteroute =express.Router();
 actualiteroute
@@ -11,9 +11,12 @@ actualiteroute
 
  
 actualiteroute
- .route('/:name')
- .get(getOnce)
+ .route('/name')
+ .get(getOnce);
 
+ actualiteroute
+ .route('/search')
+ .post(searchActualites);
 
 
 

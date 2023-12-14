@@ -12,7 +12,8 @@ import {
     verifyCode,
     forgotPassword,
     changePassword,
-    deleteUser
+    deleteUser,
+    getPartenaires
 } from '../controllers/userController.js';
 const router = express.Router();
 
@@ -26,5 +27,6 @@ router.route('/verifyCode').post(verifyCode);
 router.route('/forgotPassword').post(forgotPassword);
 router.route('/changePassword').post(changePassword);
 router.route('/deleteUser/:email').delete(deleteUser);
+router.route('/getPartenaires').get(getPartenaires);
 
 export default router;

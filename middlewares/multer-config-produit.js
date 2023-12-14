@@ -13,12 +13,12 @@ export default multer({
         destination: (req, file, callback) => {
             const __dirname = dirname(fileURLToPath(
                 import.meta.url));
-            callback(null, join(__dirname, "../public/images/actualite"));
+            callback(null, join(__dirname, "../public/images/produit"));
         },
         filename: (req, file, callback) => {
             const extension = MIME_TYPES[file.mimetype];
             callback(null, Date.now() + "." + extension);
         },
     }),
-    limits: 512 * 1024,
+   // limits: 512 * 1024,
 }).single("image");
