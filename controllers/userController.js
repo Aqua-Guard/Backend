@@ -33,16 +33,15 @@ export function login(req, res) {
 };
 
 export function registerAndroidIOS(req, res) {
-    const username = req.body.username;
-    // console.log(req.file)
-    // const image = req.file.filename;
+    const username = req.body.username
+
     User.findOne({ username })
         .then(exists => {
             if (exists) {
                 return res.status(400).json({ message: 'Username already exists' });
             }
             return User.create({
-                    username: req.body.username,
+                    username: username,
                     password: bcrypt.hashSync(req.body.password),
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
@@ -51,7 +50,7 @@ export function registerAndroidIOS(req, res) {
                     isBlocked: 0,
                     resetCode: 0,
                     nbPts: 0,
-                    image: 'profile_pic.png',
+                    image: req.file.filename,
                     role: "consommateur"
                 })
                 .then(user => {
@@ -126,6 +125,7 @@ export async function sendActivationCode(req, res) {
         const email = req.body.email
         const user = await User.findOne({ email });
         const username = user.username;
+        console.log(email)
 
         const htmlString = `
             <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
@@ -173,19 +173,28 @@ export async function sendActivationCode(req, res) {
 export async function verifyCode(req, res) {
     const { resetCode, email } = req.body;
     const user = await User.findOne({ email: email });
+    console.log(resetCode)
 
-    if (resetCode == user.resetCode) {
+    if (!user) {
+        res.status(404).json({ message: 'User not found' });
+    } else if (resetCode === null || resetCode === undefined) {
+        res.status(400).json({ message: 'resetCode is null or undefined' });
+    } else if (resetCode == user.resetCode) {
         res.status(200).json({ message: 'true' });
-    } else
-        res.status(200).json({ message: 'false' });
-};
+    } else {
+        res.status(400).json({ message: 'false' });
+    }
+}
 
 export async function forgotPassword(req, res) {
 
     const { email, newPassword, confirmPassword } = req.body;
     const user = await User.findOne({ email: email });
 
-    if (newPassword === confirmPassword) {
+    if (newPassword == "" || confirmPassword == "")
+        res.status(500).json({ message: "fields empty" });
+
+    else if (newPassword === confirmPassword) {
         var pass = bcrypt.hashSync(req.body.newPassword);
 
         var password = { password: pass };
@@ -220,6 +229,17 @@ export async function changePassword(req, res) {
 
 export async function deleteUser(req, res) {
     await User.findOneAndDelete({ email: req.params.email })
+        .then(data => {
+            return res.status(200).json({ message: "deleted" });
+        })
+        .catch(err => {
+            return res.status(404).json({ message: 'user not found' });
+        });
+};
+
+export async function deleteUserById(req, res) {
+    console.log(req.params.id)
+    await User.findOneAndDelete({ id: req.params.id })
         .then(data => {
             return res.status(200).json({ message: "deleted" });
         })
@@ -270,7 +290,7 @@ export function getPartenaires(req, res) {
     User.find({ role: "partenaire" })
         .then(users => {
             if (users.length === 0) {
-                return res.status(404).json({message: 'No users found with the specified role' });
+                return res.status(404).json({ message: 'No users found with the specified role' });
             }
             const transformedUsers = users.map(user => {
                 return {
@@ -279,13 +299,10 @@ export function getPartenaires(req, res) {
                     lastName: user.lastName,
                 };
             });
-            
+
             res.status(200).json(transformedUsers);
         })
         .catch(err => {
             res.status(500).json({ message: err });
         });
 }
-
-
-

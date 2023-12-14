@@ -45,7 +45,7 @@ export const addLike = async (req, res) => {
         // Increment the likes count on the post and save
         post.nbLike += 1;
         await post.save();
-
+        //io.emit('postLiked', { postId: req.params.postId, userId: userId});
         res.status(201).json({ message: 'Like added successfully' });
     } catch (error) {
         console.error('Error adding like:', error);

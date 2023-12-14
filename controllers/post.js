@@ -3,6 +3,15 @@ import { validationResult } from "express-validator";
 import { getCommentsByIdPost } from "./comment.js";
 import comment from "../models/comment.js";
 import { getLikesByIdPost } from "./like.js";
+import { OpenAI} from 'openai';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const openai =new OpenAI({
+  apiKey : process.env.OPENAI_API_KEY2,
+});
+
 
 // Create a new post
 export function addPost(req, res) { 
@@ -16,6 +25,7 @@ export function addPost(req, res) {
             description: req.body.description,
             image: req.file.filename,
         });
+        
         newPost.save()
             .then(post => res.status(201).json( "Post Created successfully"))
             .catch(err => res.status(500).json({ error: err }));
@@ -37,7 +47,8 @@ export function getPost(req, res) {
 // Update a post
 export function updatePost(req, res) {
     const userId = req.user.userId;
-    const postId = req.params.postId; // Assuming the post ID is passed as a URL parameter
+    const postId = req.params.postId; 
+    console.log("--------------------" +req.body.description)// Assuming the post ID is passed as a URL parameter
     Post.findById(postId)
         .then(post => {
             if (!post) {
@@ -47,7 +58,6 @@ export function updatePost(req, res) {
             if (post.userId.toString() !== userId) {
                 return res.status(403).json({ message: 'User not authorized to update this post' });
             }
-            
             if (req.body.description) {
                 post.description = req.body.description;
             }
@@ -324,3 +334,65 @@ function formatResult(result) {
 
     return formatted;
 }
+
+
+export const generateDescriptionWithChat = async (req, res) => {
+    try {
+        // Extract prompt from request. Assuming it's sent in the body under a key named 'prompt'
+        const { prompt } = req.params; // from the params
+
+        // Validate prompt
+        if (!prompt) {
+            return res.status(400).json({ error: 'No prompt provided' });
+        }
+
+        const chatCompletion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "user",  content: `Provide a concise description for the following: "${prompt}"`  } // Use the provided prompt
+            ],
+        });
+
+        // Extract the completion message
+        const completionMessage = chatCompletion.choices[0].message.content;
+
+        console.log(`openai --------------------------${completionMessage}`);
+
+        // Send the completion message as a response
+        res.json({ description: completionMessage });
+    } catch (error) {
+        console.error('Error generating description with ChatGPT:', error);
+        res.status(500).json({ error: 'Error generating description' });
+    }
+};
+
+export const detectDiscriminationInText = async (req, res) => {
+    try {
+        // Extract prompt from request. Assuming it's sent in the body under a key named 'prompt'
+        const { prompt } = req.params; // from the params
+
+        // Validate prompt
+        if (!prompt) {
+            return res.status(400).json({ error: 'No prompt provided' });
+        }
+
+        const chatCompletion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "user",  content: `Does the following text contain any discriminatory content? "${prompt}" Answer with 'Yes' or 'No' only.` }
+            ],
+        });
+
+        // Extract the completion message
+        const analysisResult = chatCompletion.choices[0].message.content;
+
+        console.log(`openai --------------------------${analysisResult}`);
+
+        // Send the analysis result as a response
+        res.json({ analysis: analysisResult });
+    } catch (error) {
+        console.error('Error analyzing text with ChatGPT:', error);
+        res.status(500).json({ error: 'Error analyzing text' });
+    }
+};
+

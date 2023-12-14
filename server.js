@@ -17,11 +17,16 @@ import likeRoutes from "./routes/like.js";
 import actualiteroute from "./routes/actualite.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
 import avisroute from "./routes/avis.js";
-
+import { Server as SocketIOServer } from "socket.io";
+import http from 'http';
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 9090 ;
+const server = http.createServer(app); // Use the http module to create a server
+const io = new SocketIOServer(server);  
+
+const PORT = process.env.PORT || 9090;
+
 const databaseName = 'AquaGuard';
 
 mongoose.set('debug', true);
@@ -64,6 +69,12 @@ app.use(errorHandler); // Handling 500 errors
 
 
 
-app.listen(PORT, () => {
+
+// You can set up Socket.IO event handlers here
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+});
+io.on('connection', (socket) => {
+    console.log('A user connected');
+   
 });
