@@ -8,25 +8,21 @@ import mongoose from 'mongoose';
 
 
 
-// export function getAll(req,res){
-// Actualite.find()
-// .then(async actualites => {
-//     const transformedevents = await Promise.all(actualites.map(async actualite => {
-//         return {
-//             idactualite: actualite._id,
-//             userId: actualite.userId,
-//             title: actualite.title,
-//             description: actualite.description,
-//             image: actualite.image,
-//             text: actualite.text,
-//             views: actualite.views,
-//         };
-//     }));
-//     res.status(200).json(transformedevents);
-// }) .catch((err) => {
-//     res.status(500).json({ error: err.message });
-// });
-// }
+export function getAll(req,res){
+Reclamation.find()
+.then(async reclamations => {
+    const transformedreclamation = await Promise.all(reclamations.map(async reclamation => {
+        return {
+            idactualite: reclamation.title,
+            userId: reclamation.userId,
+     
+        };
+    }));
+    res.status(200).json(transformedreclamation);
+}) .catch((err) => {
+    res.status(500).json({ error: err.message });
+});
+}
 
 
 

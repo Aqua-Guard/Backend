@@ -16,6 +16,7 @@ export function addPost(req, res) {
             description: req.body.description,
             image: req.file.filename,
         });
+        
         newPost.save()
             .then(post => res.status(201).json( "Post Created successfully"))
             .catch(err => res.status(500).json({ error: err }));
