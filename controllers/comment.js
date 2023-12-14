@@ -1,12 +1,23 @@
 import Comment from '../models/comment.js';
 import { validationResult } from "express-validator";
 import  Post from '../models/post.js';
+import { OpenAI} from 'openai';
+import dotenv from 'dotenv';
+
+
+dotenv.config();
+
+const openai =new OpenAI({
+  apiKey : process.env.OPENAI_API_KEY2,
+});
+
 
 // Add a comment to a post
 export const addComment = async (req, res) => {
     const userId = req.user.userId;
    // console.log(req.params.postId, userId, req.body.content) // Current user
    const postId = req.params.postId;
+  
     if (!validationResult(req).isEmpty()) {
         return res.status(400).json({ errors: validationResult(req).array() });
     } else {
@@ -22,7 +33,6 @@ export const addComment = async (req, res) => {
              return res.status(404).json({ message: 'Post not found' });
          }
 
-       
             post.nbComments += 1;
             await post.save();
             await newComment.save();
@@ -39,6 +49,9 @@ export const addComment = async (req, res) => {
                 commentUsername: `${savedComment.userId.firstName} ${savedComment.userId.lastName}`, // Update with actual logic to get username
                 comment: savedComment.comment
             };
+
+
+
             res.status(201).send(response);     
         } catch (error) {
             res.status(500).send({ message : "Error adding comment"}); 

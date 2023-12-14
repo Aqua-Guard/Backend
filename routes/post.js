@@ -1,10 +1,12 @@
 import express from 'express';
-import { GetPostPerWeek, addPost, deletePost, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, updatePost } from '../controllers/post.js';
+import { GetPostPerWeek, addPost, deletePost, detectDiscriminationInText, generateDescriptionWithChat, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, updatePost } from '../controllers/post.js';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
 import { addComment, getCommentsByPost } from '../controllers/comment.js';
 import { addLike, dislikePost, isPostLiked } from '../controllers/like.js';
+
+
 
 
 const router = express.Router();
@@ -41,6 +43,14 @@ router
 router
     .route('/PostPerWeekstat')
     .get(GetPostPerWeek);
+router
+    .route('/generateDescriptionWithChat/:prompt')
+    .get(generateDescriptionWithChat);
+    
+router
+    .route('/detectDiscrimination/:prompt')
+    .get(detectDiscriminationInText);
+
 router
     .route('/:postId')
     .put(multer,[
