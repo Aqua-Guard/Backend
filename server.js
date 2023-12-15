@@ -29,9 +29,11 @@ const PORT = process.env.PORT || 9090;
 
 const databaseName = 'AquaGuard';
 
+const db_url_atlas = process.env.DB_URL_ATLAS || 'mongodb+srv://topadmin:topadmin@cluster0.8m1dzlk.mongodb.net/?retryWrites=true&w=majority'
+
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
-mongoose.connect(`mongodb://127.0.0.1:27017/${databaseName}`)
+mongoose.connect(db_url_atlas)
     .then(() => {
 
         console.log(`Connected to ${databaseName}`);
