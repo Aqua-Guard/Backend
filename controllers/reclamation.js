@@ -13,9 +13,12 @@ Reclamation.find()
 .then(async reclamations => {
     const transformedreclamation = await Promise.all(reclamations.map(async reclamation => {
         return {
-            idactualite: reclamation.title,
+            idreclamation: reclamation._id,
             userId: reclamation.userId,
-     
+            title: reclamation.title,
+            image: reclamation.image,
+            date: reclamation.createdAt,
+            description:reclamation.description,
         };
     }));
     res.status(200).json(transformedreclamation);
@@ -29,7 +32,7 @@ Reclamation.find()
 
     export function  addOnce(req,res){
 
-
+console.log(req.body);
         const rec = new Reclamation({
             userId: new mongoose.Types.ObjectId(req.body.userId),
             title: req.body.title,
