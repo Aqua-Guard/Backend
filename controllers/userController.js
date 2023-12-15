@@ -23,8 +23,7 @@ export function login(req, res) {
                 }
             );
 
-            res.status(200).json({ id: user._id, username: user.username, image: user.image, nbPts: user.nbPts, role: user.role, email: user.email, isActivated: user.isActivated, token });
-        } else
+            res.status(200).json({ id: user._id, username: user.username, image: user.image, nbPts: user.nbPts, role: user.role,firstName: user.firstName, lastName: user.lastName, email: user.email, isActivated: user.isActivated, token });        } else
             res.status(400).json({ message: 'Invalid Credentials!' });
     })
 
@@ -33,12 +32,7 @@ export function login(req, res) {
 };
 
 export function registerAndroidIOS(req, res) {
-    console.log(req.body.username)
-    console.log(req.file)
-    const username = req.body.username;
-    const image = req.file.filename;
-    // console.log(image)
-    console.log(username)
+    const username = req.body.username
 
     User.findOne({ username })
         .then(exists => {
@@ -46,7 +40,7 @@ export function registerAndroidIOS(req, res) {
                 return res.status(400).json({ message: 'Username already exists' });
             }
             return User.create({
-                    username: req.body.username,
+                    username: username,
                     password: bcrypt.hashSync(req.body.password),
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
@@ -55,7 +49,7 @@ export function registerAndroidIOS(req, res) {
                     isBlocked: 0,
                     resetCode: 0,
                     nbPts: 0,
-                    image: image,
+                    image: req.file.filename,
                     role: "consommateur"
                 })
                 .then(user => {
@@ -128,9 +122,9 @@ export async function sendActivationCode(req, res) {
     try {
         const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
         const email = req.body.email
-        console.log(email)
         const user = await User.findOne({ email });
         const username = user.username;
+        console.log(email)
 
         const htmlString = `
             <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
@@ -178,19 +172,28 @@ export async function sendActivationCode(req, res) {
 export async function verifyCode(req, res) {
     const { resetCode, email } = req.body;
     const user = await User.findOne({ email: email });
+    console.log(resetCode)
 
-    if (resetCode == user.resetCode) {
+    if (!user) {
+        res.status(404).json({ message: 'User not found' });
+    } else if (resetCode === null || resetCode === undefined) {
+        res.status(400).json({ message: 'resetCode is null or undefined' });
+    } else if (resetCode == user.resetCode) {
         res.status(200).json({ message: 'true' });
-    } else
-        res.status(200).json({ message: 'false' });
-};
+    } else {
+        res.status(400).json({ message: 'false' });
+    }
+}
 
 export async function forgotPassword(req, res) {
 
     const { email, newPassword, confirmPassword } = req.body;
     const user = await User.findOne({ email: email });
 
-    if (newPassword === confirmPassword) {
+    if (newPassword == "" || confirmPassword == "")
+        res.status(500).json({ message: "fields empty" });
+
+    else if (newPassword === confirmPassword) {
         var pass = bcrypt.hashSync(req.body.newPassword);
 
         var password = { password: pass };
@@ -234,7 +237,8 @@ export async function deleteUser(req, res) {
 };
 
 export async function deleteUserById(req, res) {
-    await User.findOneAndDelete(req.params.id)
+    console.log(req.params.id)
+    await User.findOneAndDelete({ id: req.params.id })
         .then(data => {
             return res.status(200).json({ message: "deleted" });
         })
