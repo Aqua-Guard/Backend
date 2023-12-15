@@ -27,7 +27,26 @@ import Discution from '../models/discution.js';
 // });
 // }
 
+export function getAllMessages(req, res) {
+    const reclamationId = req.body.reclamationId;
 
+    Discution.find({ reclamationId })
+        .then (async messages => {
+            const transformeddiscution = await Promise.all(messages.map(async messages => {
+            return {
+                idreclamation: messages.reclamationId,
+                message: messages.message,
+                userRole: messages.userRole,
+                createdAt: messages.createdAt,
+
+            };
+        }));
+        res.status(200).json(transformeddiscution);
+        })
+        .catch(err => {
+            res.json({ Error: err });
+        });
+}
 
 
     export function sendMessage(req,res){
