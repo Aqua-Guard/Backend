@@ -58,7 +58,7 @@ router
         body("DateDebut").custom(isDateDebutBeforeDateFin).custom(isDateDebutValid).withMessage("DateDebut must be a valid date."),
         body("DateFin").custom(isDateFinAfterDateDebut).withMessage("DateFin must be a valid date."),
         body("Description").isLength({ min: 10, max: 500 }).withMessage("Description must be between 10 and 100 characters long."),
-        body("lieu").isLength({ min: 3, max: 30 }).withMessage()
+        body("lieu").isLength({ min: 3, max: 50 }).withMessage()
     ],
         addOnce)
     .get(getAllEvents);
@@ -74,8 +74,8 @@ router
         body("name").isLength({ min: 3, max: 30 }).withMessage("Name must be between 3 and 30 characters long."),
         body("DateDebut").custom(isDateDebutBeforeDateFin).custom(isDateDebutValid).withMessage("DateDebut must be a valid date."),
         body("DateFin").custom(isDateFinAfterDateDebut).withMessage("DateFin must be a valid date."),
-        body("Description").isLength({ min: 10, max: 500 }).withMessage("Description must be between 10 and 100 characters long."),
-        body("lieu").isLength({ min: 3, max: 30 }).withMessage()
+        body("Description").isLength({ min: 10, max: 500 }).withMessage("Description must be between 10 and 500 characters long."),
+        body("lieu").isLength({ min: 3, max: 50 }).withMessage()
     ],
         addOnceByAdmin);
 
