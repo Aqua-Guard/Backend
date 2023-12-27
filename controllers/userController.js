@@ -49,7 +49,7 @@ export function registerAndroidIOS(req, res) {
                     isBlocked: 0,
                     resetCode: 0,
                     nbPts: 0,
-                    image: req.file.filename,
+                 //   image: req.file.filename,
                     role: "consommateur"
                 })
                 .then(user => {

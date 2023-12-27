@@ -77,7 +77,7 @@ export function getOnce(req, res) {
     
             const chatCompletion = await openai.chat.completions.create({
                 messages: [{ role: "user", content: `je vais vous donner les titre suivie par son text et vous me donner (seulement) les titre des text dons parle de :( ${req.body.about} )et si vous trouver plusieur separe les avec (,) ${resultString} ... NB :donner seulement les titre des text` }],
-                model: "gpt-3.5-turbo",
+                model: "gpt-4",
             });
     
             console.log(`openai --------------------------${chatCompletion.choices[0].message.content}`);
