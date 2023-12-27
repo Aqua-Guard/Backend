@@ -18,11 +18,11 @@ const discutionSchema = new Schema(
             type: String,
             required: false,
         },
-        image: {
-            type: String,
+        visibility: {
+            type: Boolean,
             required: false,
-        }
-
+            default: true, 
+        },
 
     },
     {
