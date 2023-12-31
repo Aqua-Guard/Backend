@@ -1,72 +1,94 @@
-import express from "express";
-import { body, query } from "express-validator";
-
-import multer from "../middlewares/multer-config-produit.js";
+import { validationResult } from "express-validator";
 import Produit from "../models/produit.js";
 
-import { getAll, addOnce, getOnce, putOnce } from "../controllers/produit.js";
+export function getAll(req, res) {
+  Produit.find({})
+    .then((docs) => {
+      let list = [];
+      for (let i = 0; i < docs.length; i++) {
+        list.push({
+          _id: docs[i]._id,
+          name: docs[i].name,
+          description: docs[i].description,
+          price: docs[i].price,
+          quantity: docs[i].quantity,
+          image: docs[i].image,
+          category: docs[i].category,
+        });
+      }
+      res.status(200).json(list);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+}
 
-const router = express.Router();
-router.get("/detail", [
-  query("id").isMongoId().withMessage("Invalid product ID format"),
-], async (req, res) => {
-
-
-  const productId = req.query.id;
-
-  try {
-    const product = await Produit.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    res.status(200).json(product);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+export function addOnce(req, res) {
+  if (!validationResult(req).isEmpty()) {
+    res.status(400).json({ errors: validationResult(req).array() });
+  } else {
+    Produit.create({
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      category: req.body.category,
+      image: req.file.filename,
+    })
+      .then((newProduit) => {
+        res.status(200).json({
+          name: newProduit.name,
+          description: newProduit.description,
+          price: newProduit.price,
+          quantity: newProduit.quantity,
+          image: newProduit.image,
+          category: newProduit.category,
+        });
+      })
+      .catch((err) => {
+        res.status(500).json({ error: err });
+      });
   }
-});
+}
 
-router.get('/random-product', async (req, res, next) => {
-  try {
-    const produits = await Produit.find();
-    if (produits.length === 0) {
-      return res.status(404).json({ message: 'No produits found in the database. Something must have gone wrong.' });
-    } else {
-      const random = Math.floor(Math.random() * produits.length);
-      res.status(200).json(produits[random]);
-    }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+export function getOnce(req, res) {
+  Produit.findById(req.params.id)
+    .then((doc) => {
+      res.status(200).json(doc);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+}
 
-router
-  .route("/")
-  .get(getAll)
-  .post(
-    multer,[
-    body("image",5 * 200 * 200),
-    body("name").isLength({ min: 5 }),
-    body("description").isLength({ min: 5 }),
-    body("price").isNumeric(),
-    body("quantity").isNumeric(),],
-    addOnce
-  );
 
-router
-  .route("/:id")
-  .get(getOnce)
-  .put(
-    multer,
-    body("name").isLength({ min: 5 }),
-    body("description").isLength({ min: 5 }),
-    body("price").isNumeric(),
-    body("quantity").isNumeric(),
-    putOnce
-  );
+export function getRandomProduct(req, res) {
+  Produit.aggregate([{ $sample: { size: 1 } }])
+    .exec((err, randomProduct) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
+      }
 
-// New route to retrieve product details by ID as a query parameter
+      if (randomProduct.length === 0) {
+        return res.status(404).json({ error: "No random product found" });
+      }
+
+      res.status(200).json(randomProduct[0]);
+    });
+}
+export function deleteOnce(req, res) {
+  Produit.findByIdAndDelete(req.params.id)
+    .then((deletedProduct) => {
+      if (!deletedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      res.status(200).json({ message: "Product deleted successfully" });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+}
 
 
 
-export default router;
