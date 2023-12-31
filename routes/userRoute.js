@@ -14,7 +14,11 @@ import {
     changePassword,
     deleteUser,
     deleteUserById,
-    getPartenaires
+    getPartenaires,
+    updateProfile,
+    desactivateAccount,
+    googleSignIn,
+    completeGoogleSignin
 } from '../controllers/userController.js';
 const router = express.Router();
 
@@ -26,9 +30,12 @@ router.route('/findUserById').get(findUserById);
 router.route('/sendActivationCode').post(sendActivationCode);
 router.route('/verifyCode').post(verifyCode);
 router.route('/forgotPassword').post(forgotPassword);
+router.route('/updateProfile/:id').put(multer, updateProfile);
 router.route('/changePassword').post(changePassword);
+router.route('/googleSignIn').post(multer, googleSignIn);
+router.route('/desactivateAccount/:id').post(desactivateAccount);
 router.route('/deleteUser/:email').delete(deleteUser);
 router.route('/deleteUserById/:id').delete(deleteUserById);
 router.route('/getPartenaires').get(getPartenaires);
-
+router.route('/completeGoogleSignin/:id').put(multer, completeGoogleSignin);
 export default router;
