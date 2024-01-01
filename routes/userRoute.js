@@ -19,7 +19,8 @@ import {
     updateProfile,
     desactivateAccount,
     googleSignIn,
-    completeGoogleSignin
+    completeGoogleSignin,
+    banUser
 } from '../controllers/userController.js';
 const router = express.Router();
 
@@ -40,4 +41,6 @@ router.route('/deleteUser/:email').delete(deleteUser);
 router.route('/deleteUserById/:id').delete(deleteUserById);
 router.route('/getPartenaires').get(getPartenaires);
 router.route('/completeGoogleSignin/:id').put(multer, completeGoogleSignin);
+router.route('/banUser/:id').post(banUser);
+
 export default router;
