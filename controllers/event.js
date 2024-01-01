@@ -319,16 +319,25 @@ export async function addOnceByAdmin(req, res) {
 
         // Send email with event information
         const emailHtml = `
-            <p>Dear ${user.firstName} ${user.lastName},</p>
-            <p>We are delighted to inform you that a new event has been added by our administration:</p>
-            <p><strong>Event Name:</strong> ${newEvent.name}</p>
-            <p><strong>Date Start:</strong> ${new Date(newEvent.DateDebut).toLocaleDateString()}</p>
-            <p><strong>Date End:</strong> ${new Date(newEvent.DateFin).toLocaleDateString()}</p>            
-            <p><strong>Description:</strong> ${newEvent.Description}</p>
-            <p><strong>Location:</strong> ${newEvent.lieu}</p>
-            <p>We appreciate you choosing our platform to publish your events.</p>
-            <p>Best regards,</p>
-            <p>Aqua Guard</p>
+        <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+                <table width='100%' cellpadding='0' style='max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                    <tr>
+                    <td style='padding: 20px;'>
+                        <h2 style='color: #333;'>Event Added</h2>
+                        <p>Dear ${user.firstName} ${user.lastName},</p>
+                        <p>We are delighted to inform you that a new event has been added by our administration:</p>
+                        <p><strong>Event Name:</strong> ${newEvent.name}</p>
+                        <p><strong>Date Start:</strong> ${new Date(newEvent.DateDebut).toLocaleDateString()}</p>
+                        <p><strong>Date End:</strong> ${new Date(newEvent.DateFin).toLocaleDateString()}</p>            
+                        <p><strong>Description:</strong> ${newEvent.Description}</p>
+                        <p><strong>Location:</strong> ${newEvent.lieu}</p>
+                        <p>We appreciate you choosing our platform to publish your events.</p>
+                        <p>Best regards,</p>
+                        <p>Aqua Guard</p>
+                    </td>
+                    </tr>
+                </table>
+        </body>
 
         `;
 
@@ -342,7 +351,7 @@ export async function addOnceByAdmin(req, res) {
 
         const mailOptions = {
             from: 'Aqua Guard',
-            to: userEmail, 
+            to: userEmail,
             subject: 'New Event Added',
             html: emailHtml,
         };
