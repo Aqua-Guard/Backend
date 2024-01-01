@@ -1,4 +1,4 @@
-/*
+
 import mongoose from 'mongoose';
 import Produit from '../models/produit.js';
 import User from '../models/user.js';
@@ -11,7 +11,7 @@ const commandeSchema = new Schema(
       {
         produit: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'Produit', // Reference to the Produit model
+          ref: 'Produit', 
         },
         quantity: Number,
         name: String, // Add title field
@@ -68,4 +68,4 @@ commandeSchema.pre('save', async function (next) {
 
 
 
-export default model('Commande', commandeSchema);*/
+export default model('Commande', commandeSchema);
