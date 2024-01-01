@@ -87,6 +87,10 @@ router
     .route('/admin/generateDescriptionWithChat/:prompt')
     .get(isAdmin,generateDescriptionWithChat);
 
+/*router
+    .route('/admin/updateStatus/:id')
+    .put(isAdmin,updateStatus);*/
+
 router
     .route('/:id')
     .get(getOne)

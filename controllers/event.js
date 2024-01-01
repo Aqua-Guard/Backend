@@ -452,5 +452,28 @@ export async function sendEmailEventAdded(req, res) {
     }
 };
 
+/*
+export function updateStatus(req, res) {
+    const eventId = req.params.id;
+
+    Event.findOne({ "_id": eventId })
+        .then((event) => {
+            if (!event) {
+                return res.status(404).json({ error: "Event not found." });
+            }
+
+            // Toggle the 'hidden' field
+            event.hidden = !event.hidden;
+
+            // Save the updated event
+            return event.save();
+        })
+        .then((updatedEvent) => {
+            // Respond with the updated event
+            res.status(200).json({ event: updatedEvent });
+        })
+        .catch((err) => res.status(500).json({ error: err.message }));
+}*/
+
 
 
