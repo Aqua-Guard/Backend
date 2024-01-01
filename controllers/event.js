@@ -1,8 +1,15 @@
 import Event from "../models/event.js";
 import { validationResult } from "express-validator";
-import User from "../models/user.js";
 import Participation from "../models/participation.js";
+import { OpenAI } from 'openai';
+import dotenv from 'dotenv';
 
+
+dotenv.config();
+
+const openai =new OpenAI({
+  apiKey : process.env.OPENAI_API_KEY2,
+});
 
 /**
  * Add a new event
@@ -308,7 +315,35 @@ export function addOnceByAdmin(req, res) {
 
 }
 
+export const generateDescriptionWithChat = async (req, res) => {
+    try {
+        // Extract prompt from request. Assuming it's sent in the body under a key named 'prompt'
+        const { prompt } = req.params; // from the params
 
+        // Validate prompt
+        if (!prompt) {
+            return res.status(400).json({ error: 'No prompt provided' });
+        }
+
+        const chatCompletion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "user",  content: `Provide a concise description for the following: "${prompt}"`  } // Use the provided prompt
+            ],
+        });
+
+        // Extract the completion message
+        const completionMessage = chatCompletion.choices[0].message.content;
+
+        console.log(`openai --------------------------${completionMessage}`);
+
+        // Send the completion message as a response
+        res.json({ description: completionMessage });
+    } catch (error) {
+        console.error('Error generating description with ChatGPT:', error);
+        res.status(500).json({ error: 'Error generating description' });
+    }
+};
 
 
 
