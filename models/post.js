@@ -27,7 +27,12 @@ const PostSchema = new Schema(
         nbShare: {
             type: Number,
             default: 0
-        }
+        },
+        //  // aded for flutter 
+        //  discrimination: {
+        //    type: Boolean,
+         //   default: false,
+      //  }
 
     },
     {
