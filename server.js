@@ -34,7 +34,8 @@ const db_url_atlas = process.env.DB_URL_ATLAS || 'mongodb+srv://topadmin:topadmi
 
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
-mongoose.connect(db_url_atlas)
+mongoose.connect(`mongodb://127.0.0.1:27017/${databaseName}`)
+//mongoose.connect(db_url_atlas)// to decommente this later 
     .then(() => {
 
         console.log(`Connected to ${databaseName}`);
@@ -62,7 +63,7 @@ app.use('/participations', authenticateToken, participationRoutes); //Participat
 app.use('/produit', produitRoutes);
 //app.use('/commande', commandeRoutes);
 app.use('/act',actualiteroute);//actualite routes
-app.use('/reclamation',reclamationRoutes);//reclaation routes
+app.use('/reclamation',authenticateToken,reclamationRoutes);//reclaation routes
 app.use('/discution',discutionRoutes);//discution routes
 app.use('/avis',avisroute); // avis routes
 app.use('/event', eventRoutes);
