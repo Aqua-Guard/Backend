@@ -4,6 +4,7 @@ import { body } from 'express-validator';
 
 import {
     login,
+    loginFlutter,
     registerAndroidIOS,
     registerFlutter,
     getUsers,
@@ -23,9 +24,10 @@ import {
 const router = express.Router();
 
 router.route('/login').post([body("username").isEmpty().withMessage("username is required"), body("password").isEmpty().withMessage("password is required")], login);
+router.route('/loginFlutter').post(loginFlutter);
 router.route('/registerAndroidIOS').post(multer, registerAndroidIOS);
 router.route('/registerFlutter').post(multer, registerFlutter);
-router.route('/getUsers').get(getUsers);
+router.route('/getUsers/:id').get(getUsers);
 router.route('/findUserById').get(findUserById);
 router.route('/sendActivationCode').post(sendActivationCode);
 router.route('/verifyCode').post(verifyCode);

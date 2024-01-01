@@ -29,6 +29,36 @@ export function login(req, res) {
     }
 };
 
+export function loginFlutter(req, res) {
+    const { username, password } = req.body;
+
+    console.log(username, password)
+    if (!(username && password)) {
+        res.status(500).send("All input is required");
+    } else {
+        User.findOne({ username: username }).then(user => {
+
+            if (user && (bcrypt.compareSync(password, user.password))) {
+                if (user.role === "admin") {
+                    const token = jwt.sign({ userId: user._id, username },
+                        process.env.secret_token, {
+                            expiresIn: "2h",
+                        }
+                    );
+                    user.isActivated = 1;
+
+                    user.save();
+                    res.status(200).json({ id: user._id, username: user.username, image: user.image, nbPts: user.nbPts, role: user.role, firstName: user.firstName, lastName: user.lastName, email: user.email, isActivated: user.isActivated, token });
+                } else {
+                    res.status(403).json({ message: 'Access Denied. Only admin can login.' });
+                }
+            } else {
+                res.status(400).json({ message: 'Invalid Credentials!' });
+            }
+        })
+    }
+};
+
 export function registerAndroidIOS(req, res) {
     const username = req.body.username
 
@@ -101,12 +131,16 @@ export function registerFlutter(req, res) {
 };
 
 export function getUsers(req, res) {
-    User.find().then(user => {
-        res.status(200).json(user);
-    }).catch(err => {
-        res.status(500).json({ message: err })
-    });
-};
+    const { id } = req.params;
+
+    User.find({ _id: { $ne: id } })
+        .then(users => {
+            res.status(200).json(users);
+        })
+        .catch(err => {
+            res.status(500).json({ message: err });
+        });
+}
 
 export function findUserById(req, res) {
     User.findById(req.body.id).then(user => {
