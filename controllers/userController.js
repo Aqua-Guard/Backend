@@ -13,6 +13,10 @@ export function login(req, res) {
     } else {
         User.findOne({ username: username }).then(user => {
 
+            if (user.isBlocked) {
+                return res.status(402).json({ bannedUntil: user.bannedUntil });
+            }
+
             if (user && (bcrypt.compareSync(password, user.password))) {
                 const token = jwt.sign({ userId: user._id, username },
                     process.env.secret_token, {
@@ -39,6 +43,7 @@ export function loginFlutter(req, res) {
         User.findOne({ username: username }).then(user => {
 
             if (user && (bcrypt.compareSync(password, user.password))) {
+
                 if (user.role === "admin") {
                     const token = jwt.sign({ userId: user._id, username },
                         process.env.secret_token, {
@@ -429,4 +434,29 @@ export async function completeGoogleSignin(req, res) {
             console.error(err);
             res.status(500).json({ message: err.message || 'Internal server error' });
         });
+}
+
+export async function banUser(req, res) {
+    const id = req.params.id;
+    const currentDate = new Date();
+    const bannedUntil = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    try {
+        const user = await User.findByIdAndUpdate(
+            id, { bannedUntil: bannedUntil, isBlocked: true }, { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        setTimeout(async() => {
+            user.isBlocked = false;
+            await user.save();
+        }, bannedUntil - currentDate);
+
+        return res.status(200).json({ message: 'User blocked successfully', bannedUntil: user.bannedUntil });
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
 }
