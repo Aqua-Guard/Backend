@@ -47,7 +47,11 @@ const userSchema = new Schema({
         type: String,
         enum: ['consommateur', 'partenaire', 'admin'],
 
-    }
+    },
+    bannedUntil: {
+        type: Date,
+        required: false,
+    },
 
 }, { timestamps: true });
 
