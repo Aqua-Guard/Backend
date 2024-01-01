@@ -15,7 +15,7 @@ import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
 import likeRoutes from "./routes/like.js";
 import actualiteroute from "./routes/actualite.js";
-//import commanderoutes from "./routes/commande.js";
+import commanderoutes from "./routes/commande.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
 import avisroute from "./routes/avis.js";
 import { Server as SocketIOServer } from "socket.io";

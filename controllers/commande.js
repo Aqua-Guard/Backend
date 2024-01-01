@@ -1,8 +1,8 @@
-/*import Commande from "../models/commande.js";
+import Commande from "../models/commande.js";
 import Produit from "../models/produit.js";
 import User from "../models/user.js";
 
-const createCommande = async (req, res) => {
+export const createCommande = async (req, res) => {
   try {
     console.log('Received request body:', req.body);
     const { userId, selectedProducts, totalPrice } = req.body; // Added totalPrice from req.body
@@ -55,4 +55,4 @@ const getCommandeById = async (req, res) => {
 export default {
   createCommande,
   getCommandeById,
-};*/
+};
