@@ -3,12 +3,14 @@ import { validationResult } from "express-validator";
 import Participation from "../models/participation.js";
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
+import User from '../models/user.js';
+import nodemailer from 'nodemailer';
 
 
 dotenv.config();
 
-const openai =new OpenAI({
-  apiKey : process.env.OPENAI_API_KEY2,
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY2,
 });
 
 /**
@@ -290,15 +292,18 @@ export function getEventsNBParticipants(req, res) {
 }
 
 
-export function addOnceByAdmin(req, res) {
-
+export async function addOnceByAdmin(req, res) {
     console.log(req.body);
     console.log(req.file);
+
     if (!validationResult(req).isEmpty()) {
         console.log({ errors: validationResult(req).array() })
         return res.status(400).json({ errors: validationResult(req).array() });
-    } else {
-        Event.create({
+    }
+
+    try {
+        // Create the event
+        const newEvent = await Event.create({
             userId: req.body.userId,
             name: req.body.name,
             DateDebut: req.body.DateDebut,
@@ -306,13 +311,54 @@ export function addOnceByAdmin(req, res) {
             Description: req.body.Description,
             lieu: req.body.lieu,
             image: req.file.filename,
-        })
-            .then((newEvent) => res.status(201).json("Event Added Successfully!"))
-            .catch((err) => {
-                res.status(500).json({ error: err.message });
-            });
-    }
+        });
 
+        // Fetch the user associated with the event
+        const user = await User.findById(req.body.userId);
+        const userEmail = user.email;
+
+        // Send email with event information
+        const emailHtml = `
+            <p>Dear ${user.firstName} ${user.lastName},</p>
+            <p>We are delighted to inform you that a new event has been added by our administration:</p>
+            <p><strong>Event Name:</strong> ${newEvent.name}</p>
+            <p><strong>Date Start:</strong> ${new Date(newEvent.DateDebut).toLocaleDateString()}</p>
+            <p><strong>Date End:</strong> ${new Date(newEvent.DateFin).toLocaleDateString()}</p>            
+            <p><strong>Description:</strong> ${newEvent.Description}</p>
+            <p><strong>Location:</strong> ${newEvent.lieu}</p>
+            <p>We appreciate you choosing our platform to publish your events.</p>
+            <p>Best regards,</p>
+            <p>Aqua Guard</p>
+
+        `;
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.SENDER_EMAIL,
+                pass: process.env.PASSWORD_EMAIL,
+            },
+        });
+
+        const mailOptions = {
+            from: 'Aqua Guard',
+            to: userEmail, 
+            subject: 'New Event Added',
+            html: emailHtml,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+            } else {
+                console.log('Email sent:', info.response);
+            }
+        });
+
+        res.status(201).json("Event Added Successfully!");
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
 
 export const generateDescriptionWithChat = async (req, res) => {
@@ -328,7 +374,7 @@ export const generateDescriptionWithChat = async (req, res) => {
         const chatCompletion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [
-                { role: "user",  content: `Provide a concise description for the following: "${prompt}"`  } // Use the provided prompt
+                { role: "user", content: `Provide a concise description for the following: "${prompt}"` } // Use the provided prompt
             ],
         });
 
@@ -346,7 +392,56 @@ export const generateDescriptionWithChat = async (req, res) => {
 };
 
 
+export async function sendEmailEventAdded(req, res) {
+    try {
+        const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
+        const email = req.body.email
+        const user = await User.findOne({ email });
+        const username = user.username;
+        console.log(email)
 
+        const htmlString = `
+            <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+                <table width='100%' cellpadding='0' style='max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                    <tr>
+                        <td style='padding: 20px;'>
+                            <h2 style='color: #333;'>Activation Code Email</h2>
+                            <p>Dear ${username},</p>
+                            <p>Your activation code is: <strong style='color: #009688;'>${resetCode}</strong></p>
+                            <p>Please use this code to reset your password.</p>
+                            <p>If you did not request this code, please disregard this email.</p>
+                            <p>Thank you!</p>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+        `;
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.SENDER_EMAIL,
+                pass: process.env.PASSWORD_EMAIL
+            },
+        });
+        transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: req.body.email,
+            subject: "Your Activation Code ✔",
+            html: htmlString,
+        });
+
+        User.updateOne({
+            email: req.body.email,
+            resetCode: resetCode
+        }).then(docs => {
+            res.status(200).json({ email: req.body.email, resetCode });
+        });
+    } catch (error) {
+        res.status(400).json({
+            error: error
+        });
+    }
+};
 
 
 
