@@ -61,7 +61,7 @@ app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);
 //app.use('/commande', commandeRoutes);
-app.use('/act',actualiteroute);//actualite routes
+app.use('/act',authenticateToken,actualiteroute);//actualite routes
 app.use('/reclamation',authenticateToken,reclamationRoutes);//reclaation routes
 app.use('/discution',discutionRoutes);//discution routes
 app.use('/avis',avisroute); // avis routes

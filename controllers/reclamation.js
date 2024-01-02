@@ -41,6 +41,7 @@ export function getAllByUserId(req, res) {
                     image: reclamation.image,
                     date: reclamation.createdAt,
                     description: reclamation.description,
+                    answered: reclamation.answered
                 };
             }));
             res.status(200).json(transformedReclamations);
@@ -65,6 +66,7 @@ console.log(req.body);
             });
          rec 
         .save()
+       
         .then(newrec =>{
             res.json(newrec);
         })
