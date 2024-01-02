@@ -11,7 +11,7 @@ actualiteroute
 
  
 actualiteroute
- .route('/name')
+ .route('/getonebyid/:id')
  .get(getOnce);
 
  actualiteroute

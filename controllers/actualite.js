@@ -12,6 +12,8 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 export function getAll(req, res) {
+    const userId = req.user.userId;
+    console.log(userId);
     Actualite.find()
         .then(async actualites => {
             const transformedevents = await Promise.all(actualites.map(async actualite => {
@@ -34,7 +36,7 @@ export function getAll(req, res) {
 export function getOnce(req, res) {
 
 
-    Actualite.find({ "title": { $in: titlesToSearch } })
+    Actualite.findOne({ "_id": req.params.id })
         .then(doc => {
             res.status(200).json(doc);
         })
@@ -114,10 +116,10 @@ export async function addview(req, res) {
     const userId = req.user.userId;
 
     var actualiteId = req.params.actualiteId;
- 
-    const comment=""
-    const like=0
-    var newview = new Views({ userId, actualiteId,like, comment})
+
+    const comment = ""
+    const like = 0
+    var newview = new Views({ userId, actualiteId, like, comment })
     const existingAvis = await Views.findOne({ userId, actualiteId });
     if (existingAvis == null) {
         console.log("---------------------bech nsajjel taw ")
@@ -145,9 +147,13 @@ export async function addorchangelike(req, res) {
     const userId = req.user.userId;
     const actualiteId = req.params.actualiteId;
     const like = req.params.like;
-
+    var comteurreviews = 0;
+    var popularite = "";
+    var userlikeaction = 0;
 
     try {
+
+
         const actualite = await Actualite.findById(actualiteId);
         const existingAvis = await Views.findOne({ userId, actualiteId });
         console.log(existingAvis.like);
@@ -156,43 +162,80 @@ export async function addorchangelike(req, res) {
         if (like == 1) {
             if (existingAvis.like == 0) {//tzid like
                 console.log("tzid like")
-                existingAvis.like = 1;
+                existingAvis.like = 1
+                userlikeaction = 1
                 actualite.like = actualite.like + 1
             } else if (existingAvis.like == 1) {// tna77i like
                 console.log(" tna77i like")
-                existingAvis.like = 0;
-                existingAvis.comment=""
+                existingAvis.like = 0
+                userlikeaction = 0
+                existingAvis.comment = ""
                 actualite.like = actualite.like - 1
             } else if (existingAvis.like == 2) {//tbadel men dislike l'like
                 console.log("tbadel men dislike l'like")
                 actualite.like = actualite.like + 1
                 actualite.dislike = actualite.dislike - 1
-                existingAvis.like = 1;
-                existingAvis.comment=""
+                existingAvis.like = 1
+                existingAvis.comment = ""
+                userlikeaction = 1
             }
         } else if (like == 2) {
             if (existingAvis.like == 0) {//tzid dislike
                 console.log("tzid dislike")
                 actualite.dislike = actualite.dislike + 1
-                existingAvis.like = 2;
+                existingAvis.like = 2
+                userlikeaction = 2
             } else if (existingAvis.like == 1) {//tbadel men like ldislike
                 console.log("tbadel men like ldislike")
                 actualite.dislike = actualite.dislike + 1
-                existingAvis.comment=""
+                existingAvis.comment = ""
                 actualite.like = actualite.like - 1
-                existingAvis.like = 2;
+                existingAvis.like = 2
+                userlikeaction = 2
             } else if (existingAvis.like == 2) { // tna77i dislike
-                console.log("tna77i dislike")
+                console.log("tna77i dislike");
                 actualite.dislike = actualite.dislike - 1
-                existingAvis.comment=""
-                existingAvis.like = 0;
+                existingAvis.comment = ""
+                existingAvis.like = 0
+                userlikeaction = 0
             }
         }
         await existingAvis.save();
         await actualite.save();
+        if (userlikeaction == 1) {
+            await Views.find({ "actualiteId": { $in: actualiteId } })
+                .then(async reviews => {
+                    const transformedreviews = await Promise.all(reviews.map(async review => {
+                        if (review.like === 1) {
+                            comteurreviews += 1;
+                        }
+
+                    }));
+                }).catch((err) => {
+                    console.log("error")
+                });
+            // comteurreviews-=1;
 
 
-        res.status(200).json({ message: "Operation successful" });
+            console.log(comteurreviews)
+        } else if (userlikeaction == 2) {
+            await Views.find({ "actualiteId": { $in: actualiteId } })
+                .then(async reviews => {
+                    const transformedreviews = await Promise.all(reviews.map(async review => {
+                        if (review.like === 2) {
+                            comteurreviews += 1;
+                        }
+                    }));
+                }).catch((err) => {
+                    console.log("error")
+                });
+
+
+
+            console.log(comteurreviews)
+
+        }
+        res.status(200).json(comteurreviews);
     } catch (err) {
         res.status(500).json({ Error: err.message });
     }
@@ -203,6 +246,7 @@ export async function getliketable(req, res) {
 
 
     const userId = req.user.userId;
+    console.log(userId);
     const actualiteId = req.params.actualiteId;
 
     Views.findOne({ userId, actualiteId })
@@ -216,31 +260,32 @@ export async function getliketable(req, res) {
         })
         .catch((err) => res.status(500).json({ error: err.message }));
 
-        }
+}
 
 
 
 
-        export async function addreview(req, res) {
-            const userId = req.user.userId;
-            const actualiteId = req.params.actualiteId;
-            const commenter = req.params.review;
-        
-        
-            try {
-           
-                const existingAvis = await Views.findOne({ userId, actualiteId });
-                console.log(existingAvis.comment);
-                console.log("====================================");
-                        existingAvis.comment = commenter;
-                await existingAvis.save();
-             
-        
-        
-                res.status(200).json({ message: "Operation successful" });
-            } catch (err) {
-                res.status(500).json({ Error: err.message });
-            }
-        }
+export async function addreview(req, res) {
+    const userId = req.user.userId;
+    const actualiteId = req.params.actualiteId;
+    const commenter = req.params.review;
+
+
+    try {
+
+        const existingAvis = await Views.findOne({ userId, actualiteId });
+        console.log(existingAvis.comment);
+        console.log("====================================");
+        existingAvis.comment = commenter;
+        await existingAvis.save();
+
+
+
+        res.status(200).json({ message: "Operation successful" });
+    } catch (err) {
+        res.status(500).json({ Error: err.message });
+    }
+}
+
 
 
