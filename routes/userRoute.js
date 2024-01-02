@@ -4,6 +4,7 @@ import { body } from 'express-validator';
 
 import {
     login,
+    loginFlutter,
     registerAndroidIOS,
     registerFlutter,
     getUsers,
@@ -14,21 +15,32 @@ import {
     changePassword,
     deleteUser,
     deleteUserById,
-    getPartenaires
+    getPartenaires,
+    updateProfile,
+    desactivateAccount,
+    googleSignIn,
+    completeGoogleSignin,
+    banUser
 } from '../controllers/userController.js';
 const router = express.Router();
 
 router.route('/login').post([body("username").isEmpty().withMessage("username is required"), body("password").isEmpty().withMessage("password is required")], login);
+router.route('/loginFlutter').post(loginFlutter);
 router.route('/registerAndroidIOS').post(multer, registerAndroidIOS);
 router.route('/registerFlutter').post(multer, registerFlutter);
-router.route('/getUsers').get(getUsers);
+router.route('/getUsers/:id').get(getUsers);
 router.route('/findUserById').get(findUserById);
 router.route('/sendActivationCode').post(sendActivationCode);
 router.route('/verifyCode').post(verifyCode);
 router.route('/forgotPassword').post(forgotPassword);
+router.route('/updateProfile/:id').put(multer, updateProfile);
 router.route('/changePassword').post(changePassword);
+router.route('/googleSignIn').post(multer, googleSignIn);
+router.route('/desactivateAccount/:id').post(desactivateAccount);
 router.route('/deleteUser/:email').delete(deleteUser);
 router.route('/deleteUserById/:id').delete(deleteUserById);
 router.route('/getPartenaires').get(getPartenaires);
+router.route('/completeGoogleSignin/:id').put(multer, completeGoogleSignin);
+router.route('/banUser/:id').post(banUser);
 
 export default router;

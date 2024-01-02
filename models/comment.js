@@ -16,7 +16,12 @@ const CommentSchema = new Schema(
         comment: {
             type: String,
             required: true
-        }
+        },
+        // aded for flutter 
+        //discrimination: {
+        //    type: Boolean,
+        //    default: false,
+       // }
     },
     {
         timestamps: true
