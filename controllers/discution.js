@@ -1,5 +1,5 @@
 import Discution from '../models/discution.js';
-
+import Reclamation from '../models/reclamation.js';
 
 
 
@@ -28,16 +28,19 @@ import Discution from '../models/discution.js';
 // }
 
 export function getAllMessages(req, res) {
-    const reclamationId = req.body.reclamationId;
-
-    Discution.find({ reclamationId })
-        .then (async messages => {
+    const { reclamationId } = req.params;
+const visibility=true;
+    Discution.find({ reclamationId,visibility })
+        .then (async messages => { 
             const transformeddiscution = await Promise.all(messages.map(async messages => {
+             
             return {
+                idmessage: messages._id,
                 idreclamation: messages.reclamationId,
                 message: messages.message,
                 userRole: messages.userRole,
-                createdAt: messages.createdAt,
+                createdAt:messages.createdAt,
+                visibility: messages.visibility,
 
             };
         }));
@@ -48,12 +51,12 @@ export function getAllMessages(req, res) {
         });
 }
 
-
-    export function sendMessage(req,res){
-
+//send message methode for android and ios 
+    export async function sendMessage(req,res){
+        const userRole = "user";
         const discus = new Discution({
             reclamationId: req.body.reclamationId,
-            userRole: req.body.userRole,
+            userRole: userRole,
             message: req.body.message,   
             });
             if (req.file) {
@@ -61,6 +64,9 @@ export function getAllMessages(req, res) {
             }
             discus 
         .save()
+        const reclamation = await Reclamation.findById(req.body.reclamationId)
+        reclamation.answered=false 
+        await reclamation.save()
         .then(newdiscus =>{
             res.json(newdiscus);
         })
@@ -70,6 +76,86 @@ export function getAllMessages(req, res) {
     
     }
 
+//delete message methode for android and ios (in case delete for all )
+export async function deletemessageforall(req,res){
+  
+    try {
+
+        const deletedmessage = await Discution.findOneAndDelete({ "_id": req.params.id });
+
+        if (deletedmessage ) {
+            res.status(200).json({ message: "message has been deleted successfully!" });
+        } else {
+            res.status(404).json({ error: "message not found." });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+//delete message methode for android and ios (in case delete only for the user )
+export async function deletemessageonlyforuser(req,res){
+    const updatedFields = {
+        visibility: false
+    };
+    Discution.findOneAndUpdate({ "_id": req.params.id }, updatedFields, { new: true })
+    .then((updatedmessage) => {
+        if (updatedmessage) {
+            res.status(200).json("OK");
+        } else {
+            res.status(404).json({ error: "message not found." });
+        }
+    })
+    .catch((err) => res.status(500).json({ error: err.message }));
+
+}
 
 
         
+
+
+
+
+
+
+export async function deleteallllllllllmessage(req,res){
+  
+    try {
+
+        const deletedmessage = await Discution.findOneAndDelete({ "userRole": "consmateur"});
+
+        if (deletedmessage ) {
+            res.status(200).json({ message: "message has been deleted successfully!" });
+        } else {
+            res.status(404).json({ error: "message not found." });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+
+
+
+//send message methode for flutter
+export async function sendMessageadmin(req,res){
+    const userRole = "admin";
+    const discus = new Discution({
+        reclamationId: req.body.reclamationId,
+        userRole: userRole,
+        message: req.body.message,   
+        });
+
+        discus 
+    .save()
+    const reclamation = await Reclamation.findById(req.body.reclamationId)
+        reclamation.answered=true 
+        await reclamation.save()
+    .then(newdiscus =>{
+        res.json(newdiscus);
+    })
+    .catch(err=>{
+        res.json({Error:err})
+    });
+
+}

@@ -379,15 +379,15 @@ export const detectDiscriminationInText = async (req, res) => {
         const chatCompletion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [
-                { role: "user",  content: `Does the following text contain any discriminatory content? "${prompt}" Answer with 'Yes' or 'No' only.` }
+                { role: "user",  content: `Does the following text contain any discriminatory content? "${prompt}" Answer with 'true' or 'false' only.` }
             ],
         });
-
+        
         // Extract the completion message
         const analysisResult = chatCompletion.choices[0].message.content;
 
+        
         console.log(`openai --------------------------${analysisResult}`);
-
         // Send the analysis result as a response
         res.json({ analysis: analysisResult });
     } catch (error) {
@@ -396,3 +396,21 @@ export const detectDiscriminationInText = async (req, res) => {
     }
 };
 
+// Share a post
+export async function sharePost(req, res) {
+    const { postId } = req.params;
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        post.nbShare += 1;
+
+        await post.save();
+
+        res.json({ message: "Post Shared with success" });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error sharing the post', error });
+    }
+}

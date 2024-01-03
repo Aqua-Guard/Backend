@@ -1,5 +1,5 @@
 import express from 'express';
-import {addOnce, getAll} from '../controllers/reclamation.js';
+import {addOnce, getAll,getAllByUserId} from '../controllers/reclamation.js';
 import {getAllMessages} from '../controllers/discution.js';
 
 import multer from '../middlewares/multer-config-reclamation.js';
@@ -16,11 +16,17 @@ reclamationRoutes
     reclamationRoutes
     .route('/get')
     .get(getAll);
+
+    
     reclamationRoutes
-    .route('/getdiscution')
+    .route('/getdiscution/:reclamationId')
     .post(
         multer,getAllMessages);
 
+        reclamationRoutes
+        .route('/getbyuserId')
+        .get(getAllByUserId);
+ 
 
 
  

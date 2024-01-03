@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import Produit from "../models/produit.js";
 
 export function getAll(req, res) {
@@ -24,35 +23,30 @@ export function getAll(req, res) {
 }
 
 export function addOnce(req, res) {
-  if (!validationResult(req).isEmpty()) {
-    res.status(400).json({ errors: validationResult(req).array() });
-  } else {
-    Produit.create({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      quantity: req.body.quantity,
-      category: req.body.category,
-      image: req.file.filename,
+  console.log('Received POST request:', req.body); // Logging request body
+
+  Produit.create({
+    name: req.body.name,
+    description: req.body.description,
+    price: req.body.price,
+    quantity: req.body.quantity,
+    category: req.body.category,
+    image: req.body.image, 
+  })
+    .then((newProduit) => {
+      console.log('New product created:', newProduit); // Log the created product
+      res.status(201).json(newProduit); // Return the created product
     })
-      .then((newProduit) => {
-        res.status(200).json({
-          name: newProduit.name,
-          description: newProduit.description,
-          price: newProduit.price,
-          quantity: newProduit.quantity,
-          image: newProduit.image,
-          category: newProduit.category,
-        });
-      })
-      .catch((err) => {
-        res.status(500).json({ error: err });
-      });
-  }
+    .catch((err) => {
+      console.error('Error creating product:', err); // Log any error during creation
+      res.status(500).json({ error: err.message || 'Internal server error' }); // Return error response
+    });
 }
 
+
 export function getOnce(req, res) {
-  Produit.findById(req.params.id)
+  ProductId=req.body.id;
+  Produit.findById(ProductId)
     .then((doc) => {
       res.status(200).json(doc);
     })
@@ -60,55 +54,51 @@ export function getOnce(req, res) {
       res.status(500).json({ error: err });
     });
 }
-
 export function putOnce(req, res) {
-  let newProduit = {};
-  if(req.file == undefined) {
-    newProduit = {
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      quantity: req.body.quantity
-    }
+  let newProduit = {
+    id:req.body.id,
+    name: req.body.name,
+    description: req.body.description,
+    price: req.body.price,
+    quantity: req.body.quantity
+  };
+  if (req.body.image) {
+    newProduit.image = req.body.image;
   }
-  else {
-    newProduit = {
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      quantity: req.body.quantity,
-      image: `${req.protocol}://${req.get("host")}/img/${req.file.filename}`
-    }
-  }
-  Produit.findByIdAndUpdate(req.params.id, newProduit)
-    .then((doc1) => {
-      Produit.findById(req.params.id)
-        .then((doc2) => {
-          res.status(200).json(doc2);
-        })
-        .catch((err) => {
-          res.status(500).json({ error: err });
-        });
+
+  const productId = req.body.id; // Use params.id for the product ID
+
+  console.log('Received PUT request for productId:', productId); // Logging the received productId
+  console.log('Updated product details:', newProduit); // Logging the updated product details
+
+  Produit.findByIdAndUpdate(productId, newProduit, { new: true })
+    .then((updatedProduct) => {
+      if (!updatedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      console.log('Updated product:', updatedProduct); // Log the updated product
+      res.status(200).json(updatedProduct);
+    })
+    .catch((err) => {
+      console.error('Error updating product:', err); // Log any error during the update
+      res.status(500).json({ error: err });
+    });
+}
+
+
+
+export function deleteOnce(req, res) {
+  const productId = req.body.id; 
+  Produit.findByIdAndDelete(productId)
+    .then((deletedProduct) => {
+      if (!deletedProduct) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      res.status(200).json({ message: "Product deleted successfully" });
     })
     .catch((err) => {
       res.status(500).json({ error: err });
     });
 }
-export function getRandomProduct(req, res) {
-  Produit.aggregate([{ $sample: { size: 1 } }])
-    .exec((err, randomProduct) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: err.message });
-      }
-
-      if (randomProduct.length === 0) {
-        return res.status(404).json({ error: "No random product found" });
-      }
-
-      res.status(200).json(randomProduct[0]);
-    });
-}
-
 
 

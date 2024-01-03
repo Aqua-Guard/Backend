@@ -20,6 +20,10 @@ const reclamationSchema = new Schema(
         image: {
             type: String,
             required: true,
+        },
+        answered: {
+            type: Boolean,
+            default: false,
         }
     },
     {

@@ -26,7 +26,18 @@ const actualiteSchema = new Schema(
         },
         views: {
             type: Number,
-            required: true
+            required: true,
+            default: 0
+        },
+        like: {
+            type: Number,
+            required: true,
+            default: 0
+        },
+        dislike: {
+            type: Number,
+            required: true,
+            default: 0
         }
     },
     {

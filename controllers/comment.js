@@ -3,7 +3,9 @@ import { validationResult } from "express-validator";
 import  Post from '../models/post.js';
 import { OpenAI} from 'openai';
 import dotenv from 'dotenv';
-
+import comment from '../models/comment.js';
+import User from '../models/user.js';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -142,3 +144,64 @@ export const deleteComment = async (req, res) => {
     }
 };
 
+// Delete a specific comment
+export const deleteadminComment = async (req, res) => {
+    const { commentId } = req.params;
+   
+    if (!commentId) {
+        return res.status(400).json({ error: "Comment ID is required." });
+    }
+    try {
+
+       const comment = await Comment.findById(commentId);
+
+      
+
+        const user = await User.findOne({ _id: comment.userId });
+      
+            if (user) {
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.SENDER_EMAIL,
+                        pass: process.env.PASSWORD_EMAIL,
+                    },
+                });
+
+                const htmlString = `
+                <body style='font-family: Verdana, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+                <table width='100%' cellpadding='0' style='max-width: 620px; margin: 30px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.15);'>
+                    <tr>
+                        <td style='padding: 30px;'>
+                            <h2 style='color: #00689B; font-size: 24px;'>Comment Deleted</h2>
+                            <p>Dear <strong>${user.firstName} ${user.lastName}</strong>,</p>
+                            <p>We regret to inform you that your recent comment on our platform has been removed due to its violation of our community standards against discrimination.</p>
+                            <p>It's important to us to maintain a respectful and inclusive environment for all users. We appreciate your understanding and cooperation in this matter.</p>
+                            <p>If you have any questions, please don't hesitate to contact our support team.</p>
+                            <p>Warm regards,</p>
+                            <p><strong>Aqua Guard Team</strong></p>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            
+          `;
+
+          await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: 'Comment Deletion Notification',
+            html: htmlString,
+        });
+            }
+
+
+            const deletedComment = await Comment.findByIdAndDelete(commentId);
+        if (!deletedComment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+        res.status(200).json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting comment', error });
+    }
+};
