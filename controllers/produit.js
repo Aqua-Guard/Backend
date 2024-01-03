@@ -23,7 +23,7 @@ export function getAll(req, res) {
 }
 
 export function addOnce(req, res) {
-  console.log('Received POST request:', req.body); // Logging request body
+  console.log('Received POST request:', req.body);
 
   Produit.create({
     name: req.body.name,
@@ -31,7 +31,7 @@ export function addOnce(req, res) {
     price: req.body.price,
     quantity: req.body.quantity,
     category: req.body.category,
-    image: req.body.image, 
+    image: req.body.file.filename, 
   })
     .then((newProduit) => {
       console.log('New product created:', newProduit); // Log the created product
@@ -62,8 +62,8 @@ export function putOnce(req, res) {
     price: req.body.price,
     quantity: req.body.quantity
   };
-  if (req.body.image) {
-    newProduit.image = req.body.image;
+  if (req.body.file.filename) {
+    newProduit.image = req.body.file.filename;
   }
 
   const productId = req.body.id; // Use params.id for the product ID
