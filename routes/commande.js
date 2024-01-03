@@ -1,17 +1,9 @@
 import express from "express";
-import Commande from "../models/commande.js";
-import Produit from"../models/produit.js";
 import { createCommande } from "../controllers/commande.js";
 
+const commandeRoutes = express.Router();
 
+commandeRoutes.post('/',createCommande);
+commandeRoutes.get('/')
 
-
-const router = express.Router();
-router.post('/',createCommande);
-router.get('/')
-
-export default router;
-
-
-
-
+export default commandeRoutes;

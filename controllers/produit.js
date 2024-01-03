@@ -100,5 +100,3 @@ export function deleteOnce(req, res) {
       res.status(500).json({ error: err });
     });
 }
-
-
