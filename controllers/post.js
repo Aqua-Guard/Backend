@@ -396,3 +396,21 @@ export const detectDiscriminationInText = async (req, res) => {
     }
 };
 
+// Share a post
+export async function sharePost(req, res) {
+    const { postId } = req.params;
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        post.nbShare += 1;
+
+        await post.save();
+
+        res.json({ message: "Post Shared with success" });
+
+    } catch (error) {
+        res.status(500).json({ message: 'Error sharing the post', error });
+    }
+}
