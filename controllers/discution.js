@@ -1,5 +1,5 @@
 import Discution from '../models/discution.js';
-
+import Reclamation from '../models/reclamation.js';
 
 
 
@@ -52,7 +52,7 @@ const visibility=true;
 }
 
 //send message methode for android and ios 
-    export function sendMessage(req,res){
+    export async function sendMessage(req,res){
         const userRole = "user";
         const discus = new Discution({
             reclamationId: req.body.reclamationId,
@@ -64,6 +64,9 @@ const visibility=true;
             }
             discus 
         .save()
+        const reclamation = await Reclamation.findById(req.body.reclamationId)
+        reclamation.answered=false 
+        await reclamation.save()
         .then(newdiscus =>{
             res.json(newdiscus);
         })
@@ -135,7 +138,7 @@ export async function deleteallllllllllmessage(req,res){
 
 
 //send message methode for flutter
-export function sendMessageadmin(req,res){
+export async function sendMessageadmin(req,res){
     const userRole = "admin";
     const discus = new Discution({
         reclamationId: req.body.reclamationId,
@@ -145,6 +148,9 @@ export function sendMessageadmin(req,res){
 
         discus 
     .save()
+    const reclamation = await Reclamation.findById(req.body.reclamationId)
+        reclamation.answered=true 
+        await reclamation.save()
     .then(newdiscus =>{
         res.json(newdiscus);
     })

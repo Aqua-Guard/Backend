@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
-import { deleteComment, updateComment } from '../controllers/comment.js';
+import { deleteComment, deleteadminComment, updateComment } from '../controllers/comment.js';
 
 
 const router = express.Router();
@@ -24,5 +24,7 @@ router
         , updateComment)
     .delete(deleteComment);
 
-
+router
+    .route('/admin/:commentId')
+    .delete(deleteadminComment);
 export default router;

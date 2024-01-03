@@ -1,5 +1,5 @@
 import express from 'express';
-import { GetPostPerWeek, addPost, deletePost, detectDiscriminationInText, generateDescriptionWithChat, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, updatePost } from '../controllers/post.js';
+import { GetPostPerWeek, addPost, deletePost, detectDiscriminationInText, generateDescriptionWithChat, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, sharePost, updatePost } from '../controllers/post.js';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
@@ -98,6 +98,7 @@ router
             }),
         addComment)
     .get(getCommentsByPost)
-
+router.route("/share/:postId")
+.post(sharePost)
 
 export default router;
