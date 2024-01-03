@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "../middlewares/multer-config-produit.js";
 
 const router = express.Router();
 
@@ -11,8 +12,8 @@ import {
 
 
 router.get("/", getAll);
-router.post("/", addOnce);
-router.put("/", putOnce);
+router.post("/",multer, addOnce);
+router.put("/",multer, putOnce);
 router.delete("/", deleteOnce);
 
 export default router;

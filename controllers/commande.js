@@ -5,7 +5,7 @@ import User from "../models/user.js";
 export const createCommande = async (req, res) => {
   try {
     console.log('Received request body:', req.body);
-    const { userId, selectedProducts, totalPrice } = req.body; // Added totalPrice from req.body
+    const { userId, selectedProducts, totalPrice } = req.body; 
     const newCommande = new Commande({ userId, selectedProducts, totalPrice });
     const savedCommande = await newCommande.save();
     const user = await User.findById(userId); 
@@ -18,17 +18,15 @@ export const createCommande = async (req, res) => {
       } else {
         productCount[product] = 1;
       }
-    }
-    for (const productId in productCount) {
-      const product = await Produit.findById(productId); 
-      if (product) {
-        const quantityToReduce = productCount[productId];
-        product.quantity -= quantityToReduce;
-        product.nbsales += quantityToReduce;
-        await product.save();
+    
+      const foundProduct = await Produit.findById(product);
+      if (foundProduct) {
+        const quantityToReduce = productCount[product];
+        foundProduct.quantity -= quantityToReduce;
+        foundProduct.nbsales += quantityToReduce;
+        await foundProduct.save();
       }
     }
-
     // Logging the occurrences of each product
     console.log('Product occurrences:', productCount);
 

@@ -31,7 +31,7 @@ export function addOnce(req, res) {
     price: req.body.price,
     quantity: req.body.quantity,
     category: req.body.category,
-    image: req.body.file.filename, 
+    image: req.file.filename, 
   })
     .then((newProduit) => {
       console.log('New product created:', newProduit); // Log the created product
