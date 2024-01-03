@@ -15,7 +15,7 @@ import postRoutes from "./routes/post.js";
 import commentRoutes from "./routes/comment.js";
 import likeRoutes from "./routes/like.js";
 import actualiteroute from "./routes/actualite.js";
-import commanderoutes from "./routes/commande.js";
+import commandeRoutes from "./routes/commande.js";
 import { authenticateToken } from "./middlewares/user-auth-middleware.js";
 import avisroute from "./routes/avis.js";
 import { Server as SocketIOServer } from "socket.io";
@@ -61,7 +61,7 @@ app.use('/like',authenticateToken, likeRoutes); //Like routes
 app.use('/comments', authenticateToken, commentRoutes); //Comment routes
 app.use('/participations', authenticateToken, participationRoutes); //Participation routes
 app.use('/produit', produitRoutes);
-//app.use('/commande', commandeRoutes);
+app.use('/commande', commandeRoutes);
 app.use('/act',actualiteroute);//actualite routes
 app.use('/reclamation',authenticateToken,reclamationRoutes);//reclaation routes
 app.use('/discution',discutionRoutes);//discution routes
