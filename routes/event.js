@@ -1,5 +1,5 @@
 import express from 'express';
-import { addOnce, getAllEvents, getOne, updateOne, deleteOne, getAllEventsByUser, getAllEventsWithParticipations,getEventsNBParticipants,addOnceByAdmin,generateDescriptionWithChat } from '../controllers/event.js';
+import { addOnce, getAllEvents, getOne, updateOne, deleteOne, getAllEventsByUser, getAllEventsWithParticipations,getEventsNBParticipants,addOnceByAdmin,generateDescriptionWithChat,updateStatus } from '../controllers/event.js';
 import { body } from 'express-validator';
 import multer from '../middlewares/multer-config-event.js';
 import user from '../models/user.js';
@@ -87,9 +87,9 @@ router
     .route('/admin/generateDescriptionWithChat/:prompt')
     .get(isAdmin,generateDescriptionWithChat);
 
-/*router
+router
     .route('/admin/updateStatus/:id')
-    .put(isAdmin,updateStatus);*/
+    .put(isAdmin,updateStatus);
 
 router
     .route('/:id')
