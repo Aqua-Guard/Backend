@@ -32,10 +32,10 @@ const eventSchema = new Schema({
         type: String,
         required: true
     },
-   /* hidden: {
+    hidden: {
         type: Boolean,
         default: false
-    },*/
+    },
 }, {
     timestamps: true
 });
