@@ -21,6 +21,7 @@ import avisroute from "./routes/avis.js";
 import { Server as SocketIOServer } from "socket.io";
 import http from 'http';
 
+
 dotenv.config();
 const app = express();
 const server = http.createServer(app); // Use the http module to create a server
@@ -35,7 +36,7 @@ const db_url_atlas = process.env.DB_URL_ATLAS || 'mongodb+srv://topadmin:topadmi
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
 //mongoose.connect(`mongodb://127.0.0.1:27017/${databaseName}`)
-mongoose.connect(db_url_atlas)// to decommente this later 
+mongoose.connect(db_url_atlas)
     .then(() => {
 
         console.log(`Connected to ${databaseName}`);
@@ -67,7 +68,7 @@ app.use('/reclamation',authenticateToken,reclamationRoutes);//reclaation routes
 app.use('/discution',discutionRoutes);//discution routes
 app.use('/avis',avisroute); // avis routes
 app.use('/event', eventRoutes);
-app.use('/produit', produitRoutes);
+
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors
 

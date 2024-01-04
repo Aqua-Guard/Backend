@@ -53,4 +53,6 @@ const getCommandeById = async (req, res) => {
 export default {
   createCommande,
   getCommandeById,
+
 };
+
