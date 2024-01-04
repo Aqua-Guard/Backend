@@ -25,14 +25,19 @@ export function getAll(req, res) {
 export function addOnce(req, res) {
   console.log('Received POST request:', req.body);
 
-  Produit.create({
+  let productData = {
     name: req.body.name,
     description: req.body.description,
     price: req.body.price,
     quantity: req.body.quantity,
     category: req.body.category,
-    image: req.body.file.filename, 
-  })
+  };
+
+  if (req.file && req.file.filename) {
+    productData.image = req.file.filename;
+  }
+
+  Produit.create(productData)
     .then((newProduit) => {
       console.log('New product created:', newProduit); // Log the created product
       res.status(201).json(newProduit); // Return the created product
@@ -55,35 +60,40 @@ export function getOnce(req, res) {
     });
 }
 export function putOnce(req, res) {
-  let newProduit = {
-    id:req.body.id,
+  const productId = req.body.id; // Accessing productId from req.body.id
+
+  if (!productId) {
+    return res.status(400).json({ error: 'Product ID is missing in the request body' });
+  }
+
+  let updatedFields = {
     name: req.body.name,
     description: req.body.description,
     price: req.body.price,
-    quantity: req.body.quantity
+    quantity: req.body.quantity,
   };
-  if (req.body.file.filename) {
-    newProduit.image = req.body.file.filename;
+
+  if (req.file && req.file.filename) {
+    updatedFields.image = req.file.filename;
   }
 
-  const productId = req.body.id; // Use params.id for the product ID
-
   console.log('Received PUT request for productId:', productId); // Logging the received productId
-  console.log('Updated product details:', newProduit); // Logging the updated product details
+  console.log('Updated product details:', updatedFields); // Logging the updated product details
 
-  Produit.findByIdAndUpdate(productId, newProduit, { new: true })
+  Produit.findByIdAndUpdate(productId, updatedFields, { new: true })
     .then((updatedProduct) => {
       if (!updatedProduct) {
-        return res.status(404).json({ error: "Product not found" });
+        return res.status(404).json({ error: 'Product not found' });
       }
       console.log('Updated product:', updatedProduct); // Log the updated product
       res.status(200).json(updatedProduct);
     })
     .catch((err) => {
       console.error('Error updating product:', err); // Log any error during the update
-      res.status(500).json({ error: err });
+      res.status(500).json({ error: err.message || 'Internal server error' });
     });
 }
+
 
 
 
