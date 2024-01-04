@@ -1,5 +1,6 @@
 import express from "express";
 
+
 import { createCommande } from "../controllers/commande.js";
 
 
@@ -12,7 +13,3 @@ commandeRoutes.post('/',createCommande);
 commandeRoutes.get('/')
 
 export default commandeRoutes;
-
-
-
-
