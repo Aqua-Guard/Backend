@@ -68,7 +68,7 @@ app.use('/reclamation',authenticateToken,reclamationRoutes);//reclaation routes
 app.use('/discution',discutionRoutes);//discution routes
 app.use('/avis',avisroute); // avis routes
 app.use('/event', eventRoutes);
-app.use('/produit', produitRoutes);
+
 app.use(notFoundError); // Handling 404 errors
 app.use(errorHandler); // Handling 500 errors
 
