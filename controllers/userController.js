@@ -119,7 +119,7 @@ export function registerFlutter(req, res) {
                     resetCode: 0,
                     nbPts: 0,
                     image: image,
-                    role: "user"
+                    role: "admin"
                 })
                 .then(user => {
                     res.status(201).json(user);
