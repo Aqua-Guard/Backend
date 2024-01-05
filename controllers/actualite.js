@@ -25,6 +25,8 @@ export function getAll(req, res) {
                     image: actualite.image,
                     text: actualite.text,
                     views: actualite.views,
+                    like: actualite.like,
+                    dislike: actualite.dislike,
                 };
             }));
             res.status(200).json(transformedevents);
@@ -101,6 +103,9 @@ export async function searchActualites(req, res) {
                 image: actualite.image,
                 text: actualite.text,
                 views: actualite.views,
+                like: actualite.like,
+                dislike: actualite.dislike,
+                
             };
         }));
 

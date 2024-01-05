@@ -41,7 +41,6 @@ const visibility=true;
                 userRole: messages.userRole,
                 createdAt:messages.createdAt,
                 visibility: messages.visibility,
-
             };
         }));
         res.status(200).json(transformeddiscution);
