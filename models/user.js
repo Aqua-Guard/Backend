@@ -51,6 +51,7 @@ const userSchema = new Schema({
     bannedUntil: {
         type: Date,
         required: false,
+        default: Date.now()
     },
 
 }, { timestamps: true });
