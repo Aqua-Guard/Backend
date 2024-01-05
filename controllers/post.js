@@ -513,7 +513,23 @@ export const notVerifyPost = async (req, res) => {
                 },
             });
 
-            const htmlString = `...`; // Your email HTML content
+            const htmlString = `
+            <body style='font-family: Verdana, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+            <table width='100%' cellpadding='0' style='max-width: 620px; margin: 30px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.15);'>
+                <tr>
+                    <td style='padding: 30px;'>
+                        <h2 style='color: #00689B; font-size: 24px;'>Post Deleted</h2>
+                        <p>Dear <strong>${user.firstName} ${user.lastName}</strong>,</p>
+                        <p>We regret to inform you that your recent post on our platform has been removed due to its violation of our community standards.</p>
+                        <p>We strive to maintain a respectful and inclusive environment for all users and appreciate your understanding in this matter.</p>
+                        <p>If you have any questions or concerns, please feel free to reach out to our support team.</p>
+                        <p>Best regards,</p>
+                        <p><strong>Aqua Guard Team</strong></p>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        `; // Your email HTML content
 
             await transporter.sendMail({
                 from: process.env.SENDER_EMAIL,
