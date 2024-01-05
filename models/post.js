@@ -28,11 +28,11 @@ const PostSchema = new Schema(
             type: Number,
             default: 0
         },
-        //  // aded for flutter 
-        //  discrimination: {
-        //    type: Boolean,
-         //   default: false,
-      //  }
+         // aded for flutter 
+         verified: {
+           type: Boolean,
+           default: null,
+       }
 
     },
     {

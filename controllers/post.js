@@ -1,10 +1,12 @@
 import Post from "../models/post.js";
 import { validationResult } from "express-validator";
-import { getCommentsByIdPost } from "./comment.js";
+import { getCommentsByIdPost, getCommentsByIdPostAdmin } from "./comment.js";
 import comment from "../models/comment.js";
 import { getLikesByIdPost } from "./like.js";
 import { OpenAI} from 'openai';
 import dotenv from 'dotenv';
+import User from '../models/user.js';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -221,12 +223,14 @@ export function getAllPosts(req, res) {
 
 export function getAllPostsAdmin(req, res) {
     Post.find()
+    .sort({ createdAt: -1 })
         .populate('userId', 'firstName lastName role image') 
         .then(async posts => {
             const transformedPosts = await Promise.all(posts.map(async post => {
-                const comments = await getCommentsByIdPost(post._id);
+                const comments = await getCommentsByIdPostAdmin(post._id);
                 const  nbComments = await comment.countDocuments({ postId: post._id });
                 const likes = await getLikesByIdPost(post._id);
+                const postedAt = timeAgo(post.createdAt);
                 return {
                     idPost: post._id, // this is the id of the post
                     userName: `${post.userId?.firstName} ${post.userId?.lastName}`,
@@ -239,6 +243,8 @@ export function getAllPostsAdmin(req, res) {
                     nbShare: post.nbShare, // Ensure this field exists or is calculated
                     comments: comments,
                     likes:likes,
+                    postedAt: postedAt, 
+                    verified : post.verified
                 };
             }));
             res.status(200).json(transformedPosts);
@@ -247,6 +253,26 @@ export function getAllPostsAdmin(req, res) {
             console.error('Error fetching posts:', err);
             res.status(500).json({ error: err });
         });
+}
+function timeAgo(date) {
+    const now = new Date();
+    const secondsPast = (now.getTime() - date.getTime()) / 1000;
+
+    if (secondsPast < 60) {
+        return `${parseInt(secondsPast)}s ago`;
+    }
+    if (secondsPast < 3600) {
+        return `${parseInt(secondsPast / 60)}m ago`;
+    }
+    if (secondsPast <= 86400) {
+        return `${parseInt(secondsPast / 3600)}h ago`;
+    }
+    if (secondsPast > 86400) {
+        const day = date.getDate();
+        const month = date.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ", "");
+        const year = date.getFullYear() == now.getFullYear() ? "" : ` ${date.getFullYear()}`;
+        return `${day} ${month}${year}`;
+    }
 }
 // Retrieve a single post by ID
 export function getPostById(req, res) {
@@ -365,7 +391,6 @@ export const generateDescriptionWithChat = async (req, res) => {
         res.status(500).json({ error: 'Error generating description' });
     }
 };
-
 export const detectDiscriminationInText = async (req, res) => {
     try {
         // Extract prompt from request. Assuming it's sent in the body under a key named 'prompt'
@@ -395,6 +420,40 @@ export const detectDiscriminationInText = async (req, res) => {
         res.status(500).json({ error: 'Error analyzing text' });
     }
 };
+export const detectDiscriminationInTextAdmin = async (req, res) => {
+    try {
+        // Extract postId from request params
+        const { postId } = req.params;
+
+        // Fetch the post using the postId here
+        // For example, assuming you have a method to fetch the post
+        const post = await Post.findById(postId)
+
+        // Check if the post exists and has a description
+        if (!post || !post.description) {
+            return res.status(404).json({ error: 'Post not found or no description available' });
+        }
+
+        // Analyze the post's description for discrimination
+        const chatCompletion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "user", content: `Does the following text contain any discriminatory content? "${post.description}" Answer with 'true' or 'false' only.` }
+            ],
+        });
+
+        // Extract the completion message
+        const analysisResult = chatCompletion.choices[0].message.content;
+
+        console.log(`openai --------------------------${analysisResult}`);
+        // Send the analysis result as a response
+        res.json({ analysis: analysisResult });
+    } catch (error) {
+        console.error('Error analyzing text with ChatGPT:', error);
+        res.status(500).json({ error: 'Error analyzing text' });
+    }
+};
+
 
 // Share a post
 export async function sharePost(req, res) {
@@ -414,3 +473,59 @@ export async function sharePost(req, res) {
         res.status(500).json({ message: 'Error sharing the post', error });
     }
 }
+export function verifyPost(req, res) {
+    const postId = req.params.postId; 
+    Post.findById(postId)
+        .then(post => {
+            if (!post) {
+                return res.status(404).json({ message: 'Post not found' });
+            }
+                post.verified = true;
+            return post.save();
+        })
+        .then(updatedPost => res.status(200).json( "Post Updated successfully"))
+        .catch(err => res.status(500).json({ error: err }));
+}
+export const notVerifyPost = async (req, res) => {
+    const { postId } = req.params;
+    if (!postId) {
+        return res.status(400).json({ error: "Post ID is required." });
+    }
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Update the post's verified status to false
+        post.verified = false;
+        await post.save();
+
+        // Send email to the user (assuming user ID is stored in post.userId)
+        const user = await User.findById(post.userId);
+        if (user) {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.SENDER_EMAIL,
+                    pass: process.env.PASSWORD_EMAIL,
+                },
+            });
+
+            const htmlString = `...`; // Your email HTML content
+
+            await transporter.sendMail({
+                from: process.env.SENDER_EMAIL,
+                to: user.email,
+                subject: 'Post Deletion Notification',
+                html: htmlString,
+            });
+        }
+
+        return res.status(200).json({ message: 'Post updated successfully' });
+    } catch (error) {
+        console.error('Error in notVerifyPost:', error);
+        res.status(500).json({ message: 'Error updating post', error });
+    }
+};

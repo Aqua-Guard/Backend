@@ -52,7 +52,7 @@ export function addOnce(req, res) {
  * @param {*} res 
  */
 export function getAllEvents(req, res) {
-    Event.find()
+    Event.find({ hidden: false })
         .populate('userId', 'username role image')
         .then(async events => {
             const transformedevents = await Promise.all(events.map(async event => {
@@ -248,6 +248,7 @@ export function getAllEventsWithParticipations(req, res) {
                         DateDebut: event.DateDebut,
                         DateFin: event.DateFin,
                         lieu: event.lieu,
+                        hidden: event.hidden,
                         participants: participants,
                     };
                 })
@@ -331,7 +332,7 @@ export async function addOnceByAdmin(req, res) {
                         <p><strong>Date End:</strong> ${new Date(newEvent.DateFin).toLocaleDateString()}</p>            
                         <p><strong>Description:</strong> ${newEvent.Description}</p>
                         <p><strong>Location:</strong> ${newEvent.lieu}</p>
-                        <p>We appreciate you choosing our platform to publish your events.</p>
+                        <p>We appreciate you choosing our application to publish your events.</p>
                         <p>Best regards,</p>
                         <p>Aqua Guard</p>
                     </td>
@@ -401,63 +402,14 @@ export const generateDescriptionWithChat = async (req, res) => {
 };
 
 
-export async function sendEmailEventAdded(req, res) {
-    try {
-        const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
-        const email = req.body.email
-        const user = await User.findOne({ email });
-        const username = user.username;
-        console.log(email)
 
-        const htmlString = `
-            <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
-                <table width='100%' cellpadding='0' style='max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
-                    <tr>
-                        <td style='padding: 20px;'>
-                            <h2 style='color: #333;'>Activation Code Email</h2>
-                            <p>Dear ${username},</p>
-                            <p>Your activation code is: <strong style='color: #009688;'>${resetCode}</strong></p>
-                            <p>Please use this code to reset your password.</p>
-                            <p>If you did not request this code, please disregard this email.</p>
-                            <p>Thank you!</p>
-                        </td>
-                    </tr>
-                </table>
-            </body>
-        `;
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.SENDER_EMAIL,
-                pass: process.env.PASSWORD_EMAIL
-            },
-        });
-        transporter.sendMail({
-            from: process.env.SENDER_EMAIL,
-            to: req.body.email,
-            subject: "Your Activation Code ✔",
-            html: htmlString,
-        });
 
-        User.updateOne({
-            email: req.body.email,
-            resetCode: resetCode
-        }).then(docs => {
-            res.status(200).json({ email: req.body.email, resetCode });
-        });
-    } catch (error) {
-        res.status(400).json({
-            error: error
-        });
-    }
-};
 
-/*
 export function updateStatus(req, res) {
     const eventId = req.params.id;
 
     Event.findOne({ "_id": eventId })
-        .then((event) => {
+        .then(async (event) => {
             if (!event) {
                 return res.status(404).json({ error: "Event not found." });
             }
@@ -466,14 +418,130 @@ export function updateStatus(req, res) {
             event.hidden = !event.hidden;
 
             // Save the updated event
-            return event.save();
-        })
-        .then((updatedEvent) => {
+            const updatedEvent = await event.save();
+
+            // Send email notification based on the updated status
+            if (event.hidden) {
+                await sendHiddenEmail(updatedEvent);
+            } else {
+                await sendVisibleEmail(updatedEvent);
+            }
+
             // Respond with the updated event
             res.status(200).json({ event: updatedEvent });
         })
         .catch((err) => res.status(500).json({ error: err.message }));
-}*/
+}
 
+
+async function sendHiddenEmail(updatedEvent) {
+    // Fetch the user associated with the event
+    const user = await User.findById(updatedEvent.userId);
+    const userEmail = user.email;
+
+    // Send email with event information
+    const emailHtml = `
+ <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+         <table width='100%' cellpadding='0' style='max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+             <tr>
+             <td style='padding: 20px;'>
+                 <h2 style='color: #333;'>Event Hidden</h2>
+                 <p>Dear ${user.firstName} ${user.lastName},</p>
+<p>We hope this message finds you well.</p>
+<p>We regret to inform you that your event,<strong>${updatedEvent.name}</strong> , has been hidden by the administration.</p>
+<p>This decision has been made by the administration for reasons that may include policy compliance or other considerations. If you have any concerns or inquiries regarding this update, please feel free to reach out to our support team.</p>
+<p>We appreciate your understanding and cooperation in this matter.</p>
+<p>Thank you for choosing our application to showcase your events.</p>
+<p>Best regards,</p>
+<p><strong>Aqua Guard Team</strong></p>
+
+             </td>
+             </tr>
+         </table>
+ </body>
+
+ `;
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SENDER_EMAIL,
+            pass: process.env.PASSWORD_EMAIL,
+        },
+    });
+
+    const mailOptions = {
+        from: 'Aqua Guard',
+        to: userEmail,
+        subject: 'Event Hidden notification',
+        html: emailHtml,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Error sending email:', error);
+        } else {
+            console.log('Email sent:', info.response);
+        }
+    });
+
+
+}
+
+
+async function sendVisibleEmail(updatedEvent) {
+    // Fetch the user associated with the event
+    const user = await User.findById(updatedEvent.userId);
+    const userEmail = user.email;
+
+    // Send email with event information
+    const emailHtml = `
+ <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;'>
+         <table width='100%' cellpadding='0' style='max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+             <tr>
+             <td style='padding: 20px;'>
+                 <h2 style='color: #333;'>Event Visible</h2>
+                 <p>Dear ${user.firstName} ${user.lastName},</p>
+<p>We hope this message finds you well.</p>
+<p>We are pleased to inform you that your event, <strong>${updatedEvent.name}</strong>, is now visible again on our application.</p>
+<p>This decision has been reviewed, and your event is once again accessible to our audience. If you have any further questions or need additional assistance, please feel free to reach out to our support team.</p>
+<p>We appreciate your understanding and cooperation in this matter.</p>
+<p>Thank you for choosing our application to showcase your events.</p>
+<p>Best regards,</p>
+<p><strong>Aqua Guard Team</strong></p>
+
+
+             </td>
+             </tr>
+         </table>
+ </body>
+
+ `;
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SENDER_EMAIL,
+            pass: process.env.PASSWORD_EMAIL,
+        },
+    });
+
+    const mailOptions = {
+        from: 'Aqua Guard',
+        to: userEmail,
+        subject: 'Event Visible notification',
+        html: emailHtml,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Error sending email:', error);
+        } else {
+            console.log('Email sent:', info.response);
+        }
+    });
+
+
+}
 
 

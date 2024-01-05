@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 
 const MIME_TYPES = {
     "image/jpg": "jpg",
-    "image/jpeg": "jpg",
+    "image/jpeg": "jpeg",
     "image/png": "png",
 };
 

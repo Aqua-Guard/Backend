@@ -1,5 +1,5 @@
 import express from 'express';
-import { GetPostPerWeek, addPost, deletePost, detectDiscriminationInText, generateDescriptionWithChat, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, sharePost, updatePost } from '../controllers/post.js';
+import { GetPostPerWeek, addPost, deletePost, detectDiscriminationInText, detectDiscriminationInTextAdmin, generateDescriptionWithChat, getAllPosts, getAllPostsAdmin, getAllPostsByUser, getPostById, notVerifyPost, sharePost, updatePost, verifyPost } from '../controllers/post.js';
 import { body } from 'express-validator';
 import BadWordsFilter from 'bad-words';
 import multer from '../middlewares/multer-config-post.js';
@@ -39,22 +39,34 @@ router
 router
     .route('/getAdmin')
     .get(getAllPostsAdmin);
-    
+
 router
     .route('/PostPerWeekstat')
     .get(GetPostPerWeek);
-    
+
 router
     .route('/generateDescriptionWithChat/:prompt')
     .get(generateDescriptionWithChat);
-    
+
 router
     .route('/detectDiscrimination/:prompt')
     .get(detectDiscriminationInText);
 
+
+router
+    .route('/verifyPost/:postId')
+    .post(verifyPost);
+router
+    .route('/NotverifyPost/:postId')
+    .post(notVerifyPost);
+router
+    .route('/detectDiscriminationPostAdmin/:postId')
+    .get(detectDiscriminationInTextAdmin);
+
+
 router
     .route('/:postId')
-    .put(multer,[
+    .put(multer, [
         body('description')
             .notEmpty()
             .trim()
@@ -66,7 +78,7 @@ router
                 }
                 return true;
             })
-         ] ,
+    ],
         updatePost)
     .delete(deletePost)
     .get(getPostById);
@@ -99,6 +111,6 @@ router
         addComment)
     .get(getCommentsByPost)
 router.route("/share/:postId")
-.post(sharePost)
+    .post(sharePost)
 
 export default router;
