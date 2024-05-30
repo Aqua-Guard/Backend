@@ -13,6 +13,10 @@ export function login(req, res) {
     } else {
         User.findOne({ username: username }).then(user => {
 
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
             if (user.isBlocked) {
                 return res.status(402).json({ bannedUntil: user.bannedUntil });
             }
